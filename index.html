@@ -1,0 +1,1950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulado Oficial DSA - Nisto Cremos (Líder de Desbravadores)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            dbv: {
+              navy: '#000352',
+              navyLight: '#10167A',
+              orange: '#D85A0F',
+              orangeHover: '#B94908',
+              gold: '#F59E0B',
+              cream: '#F8FAFC'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Barra Superior Fixa -->
+  <header class="sticky top-0 z-40 bg-dbv-navy text-white shadow-lg border-b-4 border-dbv-orange">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Logo e Título -->
+        <div class="flex items-center gap-3">
+          <!-- Escudo Triângulo Desbravadores SVG -->
+          <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center p-1.5 shrink-0 border border-white/20">
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <polygon points="50,8 92,85 8,85" fill="#D85A0F" stroke="#F59E0B" stroke-width="5" stroke-linejoin="round"/>
+              <polygon points="50,24 78,76 22,76" fill="#000352"/>
+              <rect x="46" y="36" width="8" height="30" rx="2" fill="#FFFFFF"/>
+              <rect x="37" y="45" width="26" height="8" rx="2" fill="#FFFFFF"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-dbv-orange text-white">DSA • Liderança</span>
+              <span id="header-badge-total" class="text-xs text-blue-200 hidden sm:inline">84 Questões Oficiais</span>
+            </div>
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight leading-tight">Simulado Nisto Cremos</h1>
+          </div>
+        </div>
+
+        <!-- Status em Tempo Real (Visível durante a prova) -->
+        <div id="exam-status-bar" class="hidden flex items-center gap-3 sm:gap-5">
+          <div class="text-right">
+            <div class="text-[11px] uppercase tracking-wider text-blue-200 font-semibold">Progresso</div>
+            <div class="text-sm sm:text-base font-bold">
+              <span id="answered-count" class="text-amber-400">0</span> / <span id="total-questions-count">0</span>
+            </div>
+          </div>
+
+          <div id="timer-container" class="hidden bg-white/10 px-3 py-1.5 rounded-xl border border-white/15 flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span id="timer-display" class="font-mono text-sm sm:text-base font-bold">00:00</span>
+          </div>
+
+          <button onclick="requestFinishExam()" class="no-print bg-dbv-orange hover:bg-dbv-orangeHover text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-xl shadow transition transform active:scale-95">
+            Finalizar Prova
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso Linear -->
+      <div id="progress-track" class="hidden w-full bg-white/15 h-1.5 rounded-full mt-2.5 overflow-hidden">
+        <div id="progress-fill" class="bg-gradient-to-r from-amber-400 to-dbv-orange h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- TELA 1: CONFIGURAÇÃO DO SIMULADO -->
+    <section id="setup-screen" class="max-w-3xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-dbv-navy to-dbv-navyLight p-6 sm:p-8 text-white">
+          <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-amber-300 text-xs font-bold uppercase tracking-wider mb-3">
+            Crescimento Pessoal e Espiritual • Cartão de Líder
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">Avaliação Doutrinária: Nisto Cremos</h2>
+          <p class="text-blue-100 text-sm sm:text-base leading-relaxed">
+            Prepare-se para a prova oficial de Liderança dos Desbravadores. Este simulado abrange todas as <strong>28 Crenças Fundamentais</strong> organizadas nos <strong>6 blocos doutrinários</strong> da Igreja Adventista do Sétimo Dia, com gabarito comentado e referências bíblicas.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-8 space-y-6">
+          <!-- Seleção de Modo -->
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-3">1. Escolha a modalidade do simulado:</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button type="button" onclick="selectMode('full')" id="mode-full" class="mode-card text-left p-4 rounded-xl border-2 border-dbv-navy bg-blue-50/60 transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-extrabold text-dbv-navy text-sm">Simulado Completo</span>
+                  <span class="w-4 h-4 rounded-full border-4 border-dbv-navy bg-white"></span>
+                </div>
+                <p class="text-xs text-slate-600">Todas as <strong>84 questões</strong> (3 por crença). Ideal para domínio total do livro.</p>
+              </button>
+
+              <button type="button" onclick="selectMode('quick')" id="mode-quick" class="mode-card text-left p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-extrabold text-slate-800 text-sm">Padrão Campo (30)</span>
+                  <span class="w-4 h-4 rounded-full border-2 border-slate-300"></span>
+                </div>
+                <p class="text-xs text-slate-600"><strong>30 questões</strong> sorteadas equilibradamente entre os 6 blocos doutrinários.</p>
+              </button>
+
+              <button type="button" onclick="selectMode('block')" id="mode-block" class="mode-card text-left p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 bg-white transition">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-extrabold text-slate-800 text-sm">Por Bloco Doutrinário</span>
+                  <span class="w-4 h-4 rounded-full border-2 border-slate-300"></span>
+                </div>
+                <p class="text-xs text-slate-600">Foque em uma das 6 grandes divisões temáticas do Nisto Cremos.</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Seletor de Bloco (Condicional) -->
+          <div id="block-selector-container" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <label for="block-select" class="block text-sm font-bold text-slate-700 mb-2">Selecione o Bloco Doutrinário:</label>
+            <select id="block-select" class="w-full rounded-xl border-slate-300 border bg-white px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-dbv-navy">
+              <option value="1">1. A Doutrina de Deus (Crenças 1 a 5 — 15 questões)</option>
+              <option value="2">2. A Doutrina do Homem (Crenças 6 e 7 — 6 questões)</option>
+              <option value="3">3. A Doutrina da Salvação (Crenças 8 a 10 — 9 questões)</option>
+              <option value="4">4. A Doutrina da Igreja (Crenças 11 a 18 — 24 questões)</option>
+              <option value="5">5. A Doutrina da Vida Cristã (Crenças 19 a 23 — 15 questões)</option>
+              <option value="6">6. A Doutrina dos Últimos Acontecimentos (Crenças 24 a 28 — 15 questões)</option>
+            </select>
+          </div>
+
+          <!-- Opções Adicionais -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <label class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+              <input type="checkbox" id="opt-shuffle" checked class="mt-1 w-4 h-4 text-dbv-navy rounded focus:ring-dbv-navy">
+              <div>
+                <span class="block text-sm font-bold text-slate-800">Embaralhar ordem das questões</span>
+                <span class="block text-xs text-slate-500">Mistura os temas como nas provas reais aplicadas pelos Campos.</span>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 cursor-pointer hover:bg-slate-50 transition">
+              <input type="checkbox" id="opt-timer" checked class="mt-1 w-4 h-4 text-dbv-navy rounded focus:ring-dbv-navy">
+              <div>
+                <span class="block text-sm font-bold text-slate-800">Ativar cronômetro de prova</span>
+                <span class="block text-xs text-slate-500">Registra o tempo total gasto para concluir a avaliação.</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Info Nota de Corte -->
+          <div class="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm">
+            <svg class="w-5 h-5 text-dbv-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span><strong>Critério de Aprovação DSA:</strong> Nota igual ou superior a <strong>7,0 (70% de acertos)</strong>. Ao finalizar, você terá acesso ao diagnóstico por doutrina e ao gabarito comentado completo.</span>
+          </div>
+
+          <button onclick="startExam()" class="w-full py-3.5 px-6 rounded-xl bg-dbv-orange hover:bg-dbv-orangeHover text-white font-extrabold text-base shadow-md hover:shadow-lg transition transform active:scale-[0.99] flex items-center justify-center gap-2">
+            <span>Iniciar Simulado Agora</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 2: EXECUÇÃO DA PROVA -->
+    <section id="exam-screen" class="hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Coluna Principal da Questão -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
+            <!-- Cabeçalho da Questão -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <span id="q-number-badge" class="px-3 py-1 rounded-lg bg-dbv-navy text-white font-extrabold text-xs sm:text-sm">
+                  Questão 1
+                </span>
+                <span id="q-belief-badge" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">
+                  Crença 1 • As Escrituras Sagradas
+                </span>
+              </div>
+              <span id="q-block-label" class="text-xs font-medium text-slate-400">
+                Doutrina de Deus
+              </span>
+            </div>
+
+            <!-- Enunciado -->
+            <h3 id="q-text" class="text-base sm:text-lg font-bold text-slate-900 leading-relaxed mb-6">
+              Carregando enunciado...
+            </h3>
+
+            <!-- Alternativas -->
+            <div id="q-options" class="space-y-3">
+              <!-- Renderizado via JS -->
+            </div>
+
+            <!-- Navegação Inferior -->
+            <div class="flex items-center justify-between gap-3 pt-6 mt-8 border-t border-slate-100">
+              <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Anterior
+              </button>
+
+              <button onclick="clearCurrentAnswer()" class="text-xs font-semibold text-slate-400 hover:text-slate-600 underline">
+                Limpar marcação
+              </button>
+
+              <button id="btn-next" onclick="nextQuestion()" class="px-5 py-2.5 rounded-xl bg-dbv-navy hover:bg-dbv-navyLight text-white font-bold text-sm transition flex items-center gap-1.5">
+                Próxima
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Painel Lateral: Cartão-Resposta / Grade Rápida -->
+        <aside class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sticky top-24">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-extrabold text-sm text-slate-800 uppercase tracking-wider">Cartão de Respostas</h4>
+            <span id="nav-summary-text" class="text-xs font-semibold text-slate-500">0 respondidas</span>
+          </div>
+
+          <!-- Legenda -->
+          <div class="flex items-center gap-4 text-[11px] text-slate-500 mb-3 pb-3 border-b border-slate-100">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-dbv-navy inline-block"></span> Respondida</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-slate-100 border border-slate-300 inline-block"></span> Em branco</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm ring-2 ring-dbv-orange inline-block"></span> Atual</span>
+          </div>
+
+          <!-- Grade de Números -->
+          <div id="question-grid" class="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-6 gap-1.5 max-h-72 overflow-y-auto pr-1 custom-scrollbar">
+            <!-- Botões gerados via JS -->
+          </div>
+
+          <button onclick="requestFinishExam()" class="mt-5 w-full py-3 px-4 rounded-xl bg-dbv-orange hover:bg-dbv-orangeHover text-white font-extrabold text-sm shadow transition">
+            Entregar e Corrigir Prova
+          </button>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- TELA 3: RESULTADO E GABARITO COMENTADO -->
+    <section id="result-screen" class="hidden space-y-6">
+
+      <!-- Card Principal de Nota -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div id="result-banner" class="p-6 sm:p-8 text-white bg-gradient-to-r from-dbv-navy to-dbv-navyLight">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <span id="result-status-pill" class="inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3 bg-emerald-500 text-white">
+                Aprovado • Padrão DSA
+              </span>
+              <h2 id="result-headline" class="text-2xl sm:text-3xl font-extrabold mb-1">Resultado da Avaliação</h2>
+              <p id="result-subtext" class="text-blue-100 text-sm">Desempenho geral no simulado oficial do livro Nisto Cremos.</p>
+            </div>
+
+            <!-- Nota Grande -->
+            <div class="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-white/20 shrink-0">
+              <div class="text-center">
+                <div class="text-xs uppercase tracking-wider text-blue-200 font-bold">Nota Final</div>
+                <div id="final-grade" class="text-4xl sm:text-5xl font-black text-amber-400">0,0</div>
+                <div class="text-[11px] text-blue-200 mt-0.5">Mínimo DSA: 7,0</div>
+              </div>
+              <div class="h-12 w-px bg-white/20"></div>
+              <div class="space-y-1 text-xs sm:text-sm">
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-emerald-300 font-semibold">Acertos:</span>
+                  <span id="stat-correct" class="font-extrabold">0</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-rose-300 font-semibold">Erros:</span>
+                  <span id="stat-wrong" class="font-extrabold">0</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="text-slate-300 font-semibold">Em branco:</span>
+                  <span id="stat-blank" class="font-extrabold">0</span>
+                </div>
+                <div id="stat-time-row" class="flex items-center justify-between gap-4 pt-1 border-t border-white/15">
+                  <span class="text-blue-200 font-semibold">Tempo:</span>
+                  <span id="stat-time" class="font-mono font-bold">00:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desempenho por Bloco Doutrinário -->
+        <div class="p-6 sm:p-8">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900">Desempenho por Bloco Doutrinário</h3>
+            <div class="no-print flex flex-wrap gap-2">
+              <button onclick="window.print()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm transition flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Imprimir / Salvar PDF
+              </button>
+              <button onclick="resetToSetup()" class="px-4 py-2 rounded-xl bg-dbv-navy hover:bg-dbv-navyLight text-white font-bold text-xs sm:text-sm transition">
+                Novo Simulado
+              </button>
+            </div>
+          </div>
+
+          <div id="block-breakdown-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Cards por bloco via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Gabarito Comentado Completo -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 mb-6 border-b border-slate-200">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">Gabarito Comentado e Referências Bíblicas</h3>
+            <p class="text-xs sm:text-sm text-slate-500">Revise cada questão, sua resposta marcada e a fundamentação segundo o livro Nisto Cremos.</p>
+          </div>
+
+          <!-- Filtro de Revisão -->
+          <div class="no-print flex flex-wrap gap-2">
+            <button onclick="filterReview('all')" id="rev-filter-all" class="rev-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-dbv-navy text-white">Todas</button>
+            <button onclick="filterReview('wrong')" id="rev-filter-wrong" class="rev-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">Somente Erradas / Branco</button>
+            <button onclick="filterReview('correct')" id="rev-filter-correct" class="rev-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">Somente Acertos</button>
+          </div>
+        </div>
+
+        <div id="review-list" class="space-y-6">
+          <!-- Lista de revisão via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Personalizado de Confirmação (Sem alert/confirm nativo) -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="w-12 h-12 rounded-2xl bg-amber-100 text-dbv-orange flex items-center justify-center mb-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-extrabold text-slate-900 mb-2">Finalizar e corrigir o simulado?</h3>
+      <p id="confirm-modal-msg" class="text-sm text-slate-600 mb-6 leading-relaxed">
+        Você respondeu X de Y questões. Após finalizar, sua nota será calculada e o gabarito comentado será exibido.
+      </p>
+      <div class="flex items-center justify-end gap-3">
+        <button onclick="closeConfirmModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition">
+          Continuar Prova
+        </button>
+        <button onclick="finalizeExam()" class="px-5 py-2.5 rounded-xl bg-dbv-orange hover:bg-dbv-orangeHover text-white font-bold text-sm shadow transition">
+          Confirmar Entrega
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="no-print bg-white border-t border-slate-200 py-4 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+      <span>Simulado de Preparação para Líder de Desbravadores • Baseado nas 28 Crenças Fundamentais (IASD)</span>
+      <span class="font-semibold text-dbv-navy">Maranata! O Senhor Logo Vem!</span>
+    </div>
+  </footer>
+
+  <script>
+    // =========================================================================
+    // BANCO DE DADOS COMPLETO: 84 QUESTÕES (3 POR CRENÇA FUNDAMENTAL)
+    // =========================================================================
+    const BLOCK_NAMES = {
+      1: "1. A Doutrina de Deus (Crenças 1–5)",
+      2: "2. A Doutrina do Homem (Crenças 6–7)",
+      3: "3. A Doutrina da Salvação (Crenças 8–10)",
+      4: "4. A Doutrina da Igreja (Crenças 11–18)",
+      5: "5. A Doutrina da Vida Cristã (Crenças 19–23)",
+      6: "6. A Doutrina dos Últimos Acontecimentos (Crenças 24–28)"
+    };
+
+    const QUESTION_BANK = [
+      // ================= CRENÇA 1: AS ESCRITURAS SAGRADAS =================
+      {
+        id: 1, block: 1, beliefNum: 1, beliefName: "Crença 1 • As Escrituras Sagradas",
+        question: "De acordo com a primeira crença fundamental apresentada em 'Nisto Cremos', como ocorreu a inspiração das Escrituras Sagradas?",
+        options: [
+          "Os profetas receberam ditado verbal mecânico, anulando completamente seu estilo literário e contexto cultural.",
+          "Homens santos de Deus falaram e escreveram movidos pelo Espírito Santo, transmitindo pensamentos divinos em linguagem humana.",
+          "A Bíblia contém a Palavra de Deus apenas nas passagens proféticas, enquanto os livros históricos são falíveis.",
+          "A tradição apostólica e os concílios eclesiásticos possuem a mesma autoridade infalível das Escrituras."
+        ],
+        answer: 1,
+        explanation: "Conforme 2 Pedro 1:20-21 e 2 Timóteo 3:16-17, Deus inspirou os escritores bíblicos (inspiração plenária de pensamento, não ditado mecânico), tornando toda a Escritura a infalível revelação de Sua vontade e a norma suprema de fé e prática."
+      },
+      {
+        id: 2, block: 1, beliefNum: 1, beliefName: "Crença 1 • As Escrituras Sagradas",
+        question: "Segundo o capítulo sobre As Escrituras Sagradas em 'Nisto Cremos', qual é a relação entre o Antigo e o Novo Testamento?",
+        options: [
+          "O Antigo Testamento foi substituído pelo Novo, servindo apenas como registro histórico para o povo judeu.",
+          "O Antigo Testamento revela um Deus de justiça severa, enquanto o Novo revela um Deus distinto de amor.",
+          "Ambos constituem uma unidade indivisível: o Antigo prepara o caminho para Cristo e o Novo revela o cumprimento em Cristo.",
+          "Apenas o Novo Testamento é regra de fé normativa para a igreja cristã contemporânea."
+        ],
+        answer: 2,
+        explanation: "O livro 'Nisto Cremos' destaca a unidade harmônica entre os dois Testamentos (Lucas 24:27; João 5:39): o Antigo Testamento anuncia o Messias por meio de profecias e tipos, e o Novo Testamento apresenta o cumprimento da redenção em Jesus Cristo."
+      },
+      {
+        id: 3, block: 1, beliefNum: 1, beliefName: "Crença 1 • As Escrituras Sagradas",
+        question: "Qual princípio fundamental de interpretação bíblica ('Sola Scriptura') é defendido na Crença 1 do livro 'Nisto Cremos'?",
+        options: [
+          "A Bíblia deve ser interpretada exclusivamente pelo magistério eclesiástico.",
+          "A própria Bíblia é a sua melhor intérprete, devendo passagens difíceis ser esclarecidas por passagens mais claras.",
+          "A razão humana e a ciência moderna determinam quais milagres bíblicos devem ser aceitos.",
+          "Cada leitor pode atribuir significados alegóricos independentes do contexto histórico e gramatical."
+        ],
+        answer: 1,
+        explanation: "Em harmonia com Isaías 28:10 e 1 Coríntios 2:13, 'Nisto Cremos' afirma que a Escritura interpreta a própria Escritura, sob a iluminação do Espírito Santo e respeitando o contexto literal, histórico e gramatical."
+      },
+
+      // ================= CRENÇA 2: A TRINDADE =================
+      {
+        id: 4, block: 1, beliefNum: 2, beliefName: "Crença 2 • A Trindade",
+        question: "Como 'Nisto Cremos' define a doutrina bíblica da Trindade?",
+        options: [
+          "Um único Deus que assume três modos ou máscaras diferentes em épocas distintas da história (modalismo).",
+          "Três deuses independentes que formam uma aliança administrativa para governar o universo (triteísmo).",
+          "Há um só Deus: Pai, Filho e Espírito Santo, uma unidade de três Pessoas coeternas, coiguais e onipotentes.",
+          "Apenas o Pai é eterno; o Filho foi criado antes dos séculos e o Espírito Santo é uma força impessoal."
+        ],
+        answer: 2,
+        explanation: "Conforme Deuteronômio 6:4, Mateus 28:19 e 2 Coríntios 13:13, há um só Deus em essência, propósito e caráter, subsistindo eternamente em três Pessoas distintas — Pai, Filho e Espírito Santo."
+      },
+      {
+        id: 5, block: 1, beliefNum: 2, beliefName: "Crença 2 • A Trindade",
+        question: "Em qual episódio dos Evangelhos as três Pessoas da Divindade se manifestaram simultaneamente de forma visível e audível?",
+        options: [
+          "Na multiplicação dos pães e peixes na Galileia.",
+          "No batismo de Jesus no rio Jordão, com o Filho nas águas, o Espírito descendo como pomba e a voz do Pai dos céus.",
+          "Na purificação do templo de Jerusalém.",
+          "No sermão do Monte das Oliveiras."
+        ],
+        answer: 1,
+        explanation: "Mateus 3:16-17 registra a manifestação simultânea das três Pessoas da Trindade no batismo de Jesus, demonstrando sua distinção pessoal e perfeita cooperação no plano da salvação."
+      },
+      {
+        id: 6, block: 1, beliefNum: 2, beliefName: "Crença 2 • A Trindade",
+        question: "Sobre os atributos da Trindade descritos na Crença 2, é correto afirmar que Deus é:",
+        options: [
+          "Imortal, onipotente, onisciente, acima de tudo e sempre presente (onipresente), infinito e além da compreensão humana.",
+          "Limitado pelo tempo futuro, descobrindo as escolhas humanas apenas à medida que ocorrem.",
+          "Sujeito a mudanças de caráter entre a antiga e a nova aliança.",
+          "Conhecido exclusivamente pela especulação filosófica humana."
+        ],
+        answer: 0,
+        explanation: "Conforme 1 Timóteo 1:17 e Salmo 139, Deus é imortal, onipotente, onisciente e onipresente, ainda que infinito e além da plena compreensão humana, revelando-Se por meio de Sua Palavra e Criação."
+      },
+
+      // ================= CRENÇA 3: DEUS PAI =================
+      {
+        id: 7, block: 1, beliefNum: 3, beliefName: "Crença 3 • Deus Pai",
+        question: "De acordo com a Crença 3 ('Deus Pai'), qual é a relação de Deus Pai com a Criação e a Redenção?",
+        options: [
+          "O Pai permaneceu distante da redenção, deixando toda a iniciativa exclusivamente para o Filho.",
+          "Deus, o Eterno Pai, é o Criador, Originador, Mantenedor e Soberano de toda a criação, justo, santo, misericordioso e clemente.",
+          "O Pai criou o mundo diretamente sem a participação do Filho ou do Espírito Santo.",
+          "A paternidade de Deus aplica-se exclusivamente à nação de Israel no Antigo Testamento."
+        ],
+        answer: 1,
+        explanation: "Segundo Gênesis 1:1, Apocalipse 4:11 e João 3:16, Deus Pai é o Originador, Mantenedor e Soberano de toda a criação, tendo amado o mundo de tal maneira que entregou Seu Filho unigênito."
+      },
+      {
+        id: 8, block: 1, beliefNum: 3, beliefName: "Crença 3 • Deus Pai",
+        question: "Segundo 'Nisto Cremos', como a natureza e o caráter de Deus Pai são perfeitamente revelados aos seres humanos?",
+        options: [
+          "Apenas através das leis naturais da física e da astronomia.",
+          "Por meio de Jesus Cristo, Seu Filho, conforme Sua declaração: 'Quem Me vê a Mim vê o Pai'.",
+          "Exclusivamente pelas visões apocalípticas do livro de Daniel.",
+          "Pela intuição moral inata de cada ser humano."
+        ],
+        answer: 1,
+        explanation: "Em João 14:9 e 1 João 4:8, Jesus revela perfeitamente o caráter amorável, justo e misericordioso do Pai, desfazendo as acusações de Satanás sobre a tirania divina."
+      },
+      {
+        id: 9, block: 1, beliefNum: 3, beliefName: "Crença 3 • Deus Pai",
+        question: "O que significa a afirmação de que as qualidades e os poderes manifestados no Filho e no Espírito Santo são também os do Pai?",
+        options: [
+          "Que o Pai absorveu as outras duas Pessoas após a ascensão.",
+          "Que há plena unidade de natureza, caráter e poder eterno entre as três Pessoas da Divindade.",
+          "Que o Filho e o Espírito Santo não possuem vontade própria.",
+          "Que somente o Pai recebe adoração no santuário celestial."
+        ],
+        answer: 1,
+        explanation: "Conforme Colossenses 2:9 e João 10:30 ('Eu e o Pai somos um'), a plenitude da Divindade habita igualmente nas três Pessoas, sem inferioridade ontológica."
+      },
+
+      // ================= CRENÇA 4: DEUS FILHO =================
+      {
+        id: 10, block: 1, beliefNum: 4, beliefName: "Crença 4 • Deus Filho",
+        question: "Como 'Nisto Cremos' descreve as duas naturezas de Jesus Cristo após a encarnação?",
+        options: [
+          "Ele deixou de ser Deus durante Sua vida terrestre, reassumindo a divindade apenas na ressurreição.",
+          "Ele possuía apenas aparência humana, sem corpo físico real (docetismo).",
+          "Verdadeiramente Deus, tornou-Se também verdadeiramente homem, unindo perfeitamente a natureza divina e a humana em uma só Pessoa.",
+          "Sua natureza humana absorveu Sua divindade, tornando-O um ser intermediário entre Deus e os anjos."
+        ],
+        answer: 2,
+        explanation: "Baseado em João 1:1-3, 14 e Filipenses 2:5-8, Jesus é 100% Deus e 100% homem (união hipostática), concebido pelo Espírito Santo e nascido da virgem Maria, vivendo sem pecado."
+      },
+      {
+        id: 11, block: 1, beliefNum: 4, beliefName: "Crença 4 • Deus Filho",
+        question: "Por que 'Nisto Cremos' enfatiza que Jesus permanece para sempre como Deus-Homem?",
+        options: [
+          "Porque Ele não pôde retornar à Sua glória celestial anterior.",
+          "Para garantir perpetuamente nossa representação como Sumo Sacerdote e Advogado diante do Pai, unindo a humanidade a Deus.",
+          "Porque a encarnação foi um acidente decorrente do pecado de Adão.",
+          "Para que Ele continue sofrendo fisicamente pelos pecados futuros."
+        ],
+        answer: 1,
+        explanation: "Conforme Hebreus 4:15 e 7:25, ao assumir nossa natureza humana para sempre, Cristo tornou-Se nosso Irmão e Sumo Sacerdote eterno, garantindo o vínculo permanente entre o Céu e a humanidade redimida."
+      },
+      {
+        id: 12, block: 1, beliefNum: 4, beliefName: "Crença 4 • Deus Filho",
+        question: "De acordo com a Crença 4, qual foi o propósito da morte substitutiva de Cristo na cruz?",
+        options: [
+          "Apenas dar um exemplo moral de altruísmo e coragem diante da perseguição.",
+          "Satisfazer a justiça divina, reconciliar a humanidade com Deus e prover completa expiação pelos pecados dos que creem.",
+          "Pagar um resgate financeiro a Satanás para libertar a Terra.",
+          "Abolir a validade eterna dos Dez Mandamentos."
+        ],
+        answer: 1,
+        explanation: "Segundo 2 Coríntios 5:19, 21 e Romanos 3:25, Cristo morreu como nosso Substituto e Fiador, vindicando a justiça e o amor de Deus e assegurando a redenção eterna."
+      },
+
+      // ================= CRENÇA 5: DEUS ESPÍRITO SANTO =================
+      {
+        id: 13, block: 1, beliefNum: 5, beliefName: "Crença 5 • Deus Espírito Santo",
+        question: "Qual evidência bíblica apresentada em 'Nisto Cremos' comprova que o Espírito Santo é uma Pessoa divina e não apenas uma energia impessoal?",
+        options: [
+          "Ele é mencionado apenas por símbolos como fogo, vento e óleo.",
+          "Ele possui intelecto, vontade e emoções: ensina, convence do pecado, intercede, distribui dons conforme quer e pode ser entristecido.",
+          "Ele jamais fala na primeira pessoa nas Escrituras.",
+          "Ele foi criado por Jesus no dia de Pentecostes."
+        ],
+        answer: 1,
+        explanation: "Conforme João 14:16-17, Efésios 4:30, Atos 13:2 ('Disse o Espírito Santo: Separai-Me...') e 1 Coríntios 12:11, o Espírito Santo possui todos os atributos de personalidade e divindade."
+      },
+      {
+        id: 14, block: 1, beliefNum: 5, beliefName: "Crença 5 • Deus Espírito Santo",
+        question: "Qual é a tríplice obra de convicção realizada pelo Espírito Santo no mundo, segundo João 16:8 e a Crença 5?",
+        options: [
+          "Convencer o mundo do pecado, da justiça e do juízo.",
+          "Convencer do sábado, do dízimo e da saúde.",
+          "Convencer os anjos, os profetas e os reis.",
+          "Convencer sobre a criação, o dilúvio e o milênio."
+        ],
+        answer: 0,
+        explanation: "Em João 16:8, Jesus declarou que o Consolador convenceria o mundo do pecado (por não crerem em Cristo), da justiça (revelada em Cristo) e do juízo (a derrota definitiva de Satanás)."
+      },
+      {
+        id: 15, block: 1, beliefNum: 5, beliefName: "Crença 5 • Deus Espírito Santo",
+        question: "De que maneira o Espírito Santo participa do novo nascimento do crente?",
+        options: [
+          "Apenas auxiliando externamente o esforço próprio da vontade humana.",
+          "Renovando a mente, transformando o coração e restaurando a imagem de Deus no ser humano.",
+          "Substituindo a necessidade do estudo da Palavra de Deus.",
+          "Garantindo impecabilidade instantânea e impossibilidade de cair novamente."
+        ],
+        answer: 1,
+        explanation: "Conforme Tito 3:5 e João 3:5-6, o Espírito Santo opera a regeneração espiritual, atraindo os seres humanos a Cristo e transformando seu caráter à semelhança divina."
+      },
+
+      // ================= CRENÇA 6: A CRIAÇÃO =================
+      {
+        id: 16, block: 2, beliefNum: 6, beliefName: "Crença 6 • A Criação",
+        question: "Como o livro 'Nisto Cremos' ensina que Deus criou o mundo e toda a vida na Terra?",
+        options: [
+          "Por meio de longas eras evolutivas guiadas pelo acaso e seleção natural ao longo de milhões de anos.",
+          "Em seis dias literais e consecutivos, por meio da Sua Palavra criadora, descansando no sétimo dia.",
+          "A partir de matéria eterna preexistente que Deus apenas organizou.",
+          "De forma alegórica, sendo Gênesis 1 e 2 apenas poesia mitológica sem valor histórico."
+        ],
+        answer: 1,
+        explanation: "Conforme Gênesis 1–2, Êxodo 20:8-11 e Salmo 33:6, 9, Deus criou o céu e a Terra recentemente em seis dias literais de 24 horas ('houve tarde e manhã') pela Sua Palavra onipotente."
+      },
+      {
+        id: 17, block: 2, beliefNum: 6, beliefName: "Crença 6 • A Criação",
+        question: "Por que a doutrina da Criação literal em seis dias é essencial para a teologia adventista, segundo 'Nisto Cremos'?",
+        options: [
+          "Porque nega a existência de leis científicas.",
+          "Porque fundamenta o sábado semanal, a dignidade do ser humano criado à imagem de Deus, o matrimônio e a necessidade da redenção.",
+          "Porque prova que o pecado já existia na natureza antes da queda de Adão.",
+          "Porque limita o poder criador de Deus ao planeta Terra."
+        ],
+        answer: 1,
+        explanation: "Se houvesse morte e sofrimento por milhões de anos antes de Adão, a morte não seria o 'salário do pecado' (Romanos 6:23), minando a cruz de Cristo, o sábado memorial da Criação e a restauração da Nova Terra."
+      },
+      {
+        id: 18, block: 2, beliefNum: 6, beliefName: "Crença 6 • A Criação",
+        question: "Qual responsabilidade Deus confiou ao primeiro casal humano no Jardim do Éden após a criação?",
+        options: [
+          "Explorar e esgotar os recursos naturais sem limites.",
+          "Exercer domínio responsável como mordomos e cuidadores da criação divina.",
+          "Viver em ociosidade absoluta sem qualquer trabalho.",
+          "Criar novas espécies de animais."
+        ],
+        answer: 1,
+        explanation: "Conforme Gênesis 1:26-28 e 2:15, Deus deu ao homem e à mulher o domínio bondoso para cultivar e guardar o jardim, tornando-os mordomos responsáveis pela Terra."
+      },
+
+      // ================= CRENÇA 7: A NATUREZA DO HOMEM =================
+      {
+        id: 19, block: 2, beliefNum: 7, beliefName: "Crença 7 • A Natureza do Homem",
+        question: "Qual é a constituição do ser humano segundo Gênesis 2:7 e a Crença 7 ('A Natureza do Homem')?",
+        options: [
+          "Uma alma imortal aprisionada temporariamente dentro de um corpo físico mau.",
+          "Uma unidade indivisível de corpo, mente e espírito: o pó da terra unido ao fôlego de vida resulta em uma alma vivente.",
+          "Três entidades separadas que sobrevivem conscientemente de forma independente após a morte.",
+          "Um ser naturalmente imortal que perdeu apenas a saúde física no Éden."
+        ],
+        answer: 1,
+        explanation: "Em Gênesis 2:7, Deus formou o homem do pó da terra e soprou-lhe o fôlego de vida, e o homem tornou-se alma vivente (visão holística/monista bíblica). O homem NÃO possui uma alma imortal separada; ele É uma alma."
+      },
+      {
+        id: 20, block: 2, beliefNum: 7, beliefName: "Crença 7 • A Natureza do Homem",
+        question: "O que significa afirmar que o homem e a mulher foram criados 'à imagem de Deus'?",
+        options: [
+          "Que possuem exatamente a mesma onipotência e onisciência divina.",
+          "Que foram dotados de individualidade, poder e liberdade de pensar e fazer, além de semelhança física, mental e espiritual com o Criador.",
+          "Que apenas o homem reflete a imagem de Deus, enquanto a mulher reflete a imagem do homem.",
+          "Que a imagem de Deus foi totalmente extinta, tornando impossível qualquer resposta humana ao Espírito Santo."
+        ],
+        answer: 1,
+        explanation: "Conforme Gênesis 1:26-27, homens e mulheres foram criados à imagem de Deus com liberdade de escolha, capacidade racional, moral e relacional, embora essa imagem tenha sido desfigurada pelo pecado."
+      },
+      {
+        id: 21, block: 2, beliefNum: 7, beliefName: "Crença 7 • A Natureza do Homem",
+        question: "Quais foram as consequências imediatas da queda de Adão e Eva para toda a raça humana?",
+        options: [
+          "Apenas uma leve perda de memória, mantendo intacta a perfeição moral.",
+          "Tornaram-se sujeitos à morte, sua natureza tornou-se caída e inclinada ao mal, transmitindo essa condição mortal e pecaminosa aos descendentes.",
+          "Foram imediatamente lançados no inferno eterno.",
+          "Perderam completamente o livre-arbítrio e a responsabilidade moral."
+        ],
+        answer: 1,
+        explanation: "De acordo com Romanos 5:12-17 e Salmo 51:5, a desobediência de Adão trouxe o pecado e a morte a toda a humanidade, sujeitando os descendentes às fraquezas e tendências para o mal."
+      },
+
+      // ================= CRENÇA 8: O GRANDE CONFLITO =================
+      {
+        id: 22, block: 3, beliefNum: 8, beliefName: "Crença 8 • O Grande Conflito",
+        question: "Onde e como teve início o Grande Conflito descrito na Crença 8?",
+        options: [
+          "No Jardim do Éden, quando Eva comeu o fruto proibido.",
+          "No Céu, quando Lúcifer, um ser criado com liberdade de escolha, exaltou-se a si mesmo, rebelou-se contra a lei de Deus e tornou-se Satanás.",
+          "Na Torre de Babel, após o dilúvio.",
+          "No próprio Deus, que criou o mal para testar a obediência dos anjos."
+        ],
+        answer: 1,
+        explanation: "Conforme Isaías 14:12-14, Ezequiel 28:12-17 e Apocalipse 12:7-9, o conflito iniciou-se no Céu com a rebelião de Lúcifer contra o governo e a lei de amor de Deus, sendo depois estendido à Terra."
+      },
+      {
+        id: 23, block: 3, beliefNum: 8, beliefName: "Crença 8 • O Grande Conflito",
+        question: "Qual é a questão central em disputa no Grande Conflito entre Cristo e Satanás?",
+        options: [
+          "Qual dos dois possui maior força militar para destruir o adversário.",
+          "O caráter de Deus, Sua lei e Sua soberania sobre o universo — se Deus é verdadeiramente justo, amoroso e digno de confiança.",
+          "A localização geográfica da futura Nova Jerusalém.",
+          "A quantidade de anjos que permaneceriam leais no Céu."
+        ],
+        answer: 1,
+        explanation: "Satanás acusou Deus de ser injusto e tirânico ao exigir obediência à Sua lei. Deus não destruiu Lúcifer imediatamente para que todo o universo compreendesse a natureza maligna do pecado e a justiça do amor divino."
+      },
+      {
+        id: 24, block: 3, beliefNum: 8, beliefName: "Crença 8 • O Grande Conflito",
+        question: "De acordo com 1 Coríntios 4:9 e a Crença 8, qual é o papel do planeta Terra no contexto cósmico?",
+        options: [
+          "Um planeta isolado sem qualquer relevância para os mundos não caídos.",
+          "O teatro do universo, observado por anjos e mundos não caídos enquanto Deus vindica Seu caráter e redime a humanidade.",
+          "O único lugar habitado em todo o cosmos.",
+          "Um campo de batalha eterno onde o mal nunca será erradicado."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 4:9 e Jó 1–2, este mundo tornou-se o espetáculo do universo, onde a cruz de Cristo desmascara Satanás e confirma eternamente a justiça e o amor de Deus perante toda a criação."
+      },
+
+      // ================= CRENÇA 9: VIDA, MORTE E RESSURREIÇÃO DE CRISTO =================
+      {
+        id: 25, block: 3, beliefNum: 9, beliefName: "Crença 9 • Vida, Morte e Ressurreição de Cristo",
+        question: "Segundo a Crença 9, quais são os três elementos inseparáveis da obra redentora de Cristo na Terra?",
+        options: [
+          "Seu nascimento em Belém, Seus milagres na Galileia e Sua entrada triunfal em Jerusalém.",
+          "Sua vida de perfeita obediência à vontade de Deus, Seus sofrimentos e morte expiatória, e Sua ressurreição literal.",
+          "Seu batismo, Sua transfiguração e Sua pregação no templo.",
+          "A escolha dos doze apóstolos, a Santa Ceia e a destruição de Jerusalém."
+        ],
+        answer: 1,
+        explanation: "Na vida de perfeita obediência, morte substitutiva e ressurreição vitoriosa de Cristo, Deus proveu o único meio de expiação pelo pecado humano (1 Coríntios 15:3-4; Romanos 4:25)."
+      },
+      {
+        id: 26, block: 3, beliefNum: 9, beliefName: "Crença 9 • Vida, Morte e Ressurreição de Cristo",
+        question: "Qual é o significado teológico da ressurreição corporal de Jesus Cristo, conforme 1 Coríntios 15 e 'Nisto Cremos'?",
+        options: [
+          "Foi apenas uma experiência subjetiva na memória dos discípulos.",
+          "Proclama o triunfo de Deus sobre as forças do mal, valida a expiação na cruz e assegura a ressurreição final dos que aceitam a Cristo.",
+          "Significou que Cristo abandonou definitivamente Sua natureza humana.",
+          "Teve importância apenas para comprovar as profecias de Elias."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 15:17-22, a ressurreição de Cristo é a garantia histórica e espiritual da vitória sobre o pecado e a morte, assegurando a vida eterna aos redimidos."
+      },
+      {
+        id: 27, block: 3, beliefNum: 9, beliefName: "Crença 9 • Vida, Morte e Ressurreição de Cristo",
+        question: "Como a cruz de Cristo vindica simultaneamente a justiça e a misericórdia de Deus?",
+        options: [
+          "Perdoando o pecado sem exigir qualquer penalidade pela transgressão da lei.",
+          "Exigindo que o próprio pecador pague parcialmente sua dívida através de penitências.",
+          "Mantendo a imutabilidade da lei ao punir o pecado no Substituto divino, enquanto oferece perdão gratuito e gracioso ao pecador arrependido.",
+          "Abolindo a lei moral para que ninguém mais seja considerado transgressor."
+        ],
+        answer: 2,
+        explanation: "Conforme Romanos 3:25-26, na cruz 'a misericórdia e a verdade se encontraram' (Salmo 85:10): Deus é justo ao condenar o pecado em Cristo e justificador daquele que tem fé em Jesus."
+      },
+
+      // ================= CRENÇA 10: A EXPERIÊNCIA DA SALVAÇÃO =================
+      {
+        id: 28, block: 3, beliefNum: 10, beliefName: "Crença 10 • A Experiência da Salvação",
+        question: "De acordo com a Crença 10 ('A Experiência da Salvação'), qual é a diferença entre justificação e santificação?",
+        options: [
+          "A justificação é obtida pelas obras da lei, enquanto a santificação é recebida apenas pela fé.",
+          "A justificação é o ato instantâneo pelo qual Deus declara justo o pecador arrependido mediante a fé em Cristo; a santificação é o processo contínuo de crescimento na graça pelo Espírito.",
+          "Ambas ocorrem somente após a segunda vinda de Cristo.",
+          "Justificação e santificação são sinônimos exatos sem distinção teológica."
+        ],
+        answer: 1,
+        explanation: "Conforme Romanos 5:1, Efésios 2:8-10 e 1 Tessalonicenses 4:3, somos salvos exclusivamente pela graça mediante a fé (justificação), e essa fé genuína produz frutos de obediência e transformação contínua (santificação)."
+      },
+      {
+        id: 29, block: 3, beliefNum: 10, beliefName: "Crença 10 • A Experiência da Salvação",
+        question: "Qual é o papel das boas obras na experiência da salvação segundo Efésios 2:8-10 e 'Nisto Cremos'?",
+        options: [
+          "São a base meritória que conquista o favor e o perdão de Deus.",
+          "São o fruto natural e a evidência de uma fé viva e salvadora, jamais a causa da salvação.",
+          "São desnecessárias para quem já aceitou a graça de Cristo.",
+          "Servem para compensar os pecados cometidos após o batismo."
+        ],
+        answer: 1,
+        explanation: "Somos salvos pela graça, mediante a fé, não por obras (Efésios 2:8-9), mas somos 'criados em Cristo Jesus para boas obras' (v. 10). A obediência é o resultado da salvação, nunca seu preço."
+      },
+      {
+        id: 30, block: 3, beliefNum: 10, beliefName: "Crença 10 • A Experiência da Salvação",
+        question: "Segundo a Crença 10, o pecador arrependido que aceita a Cristo pode ter certeza da salvação no tempo presente?",
+        options: [
+          "Não, pois ninguém pode saber se está aceito por Deus antes do juízo final.",
+          "Sim, pela fé em Cristo somos perdoados, adotados como filhos de Deus e temos a certeza presente da salvação enquanto permanecermos nEle.",
+          "Sim, e uma vez salvo é impossível que a pessoa venha a rejeitar a Deus no futuro.",
+          "Apenas os líderes religiosos e mártires podem ter certeza da salvação."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 João 5:11-13 e Romanos 8:1, 16, o crente que permanece em Cristo tem plena certeza presente de sua aceitação e vida eterna, respeitando-se continuamente o livre-arbítrio."
+      },
+
+      // ================= CRENÇA 11: CRESCIMENTO EM CRISTO =================
+      {
+        id: 31, block: 4, beliefNum: 11, beliefName: "Crença 11 • Crescimento em Cristo",
+        question: "A Crença 11 ('Crescimento em Cristo'), adicionada em 2005 às Crenças Fundamentais, enfatiza que a vitória sobre as forças do mal é conquistada:",
+        options: [
+          "Pela força de vontade humana disciplinada por regras ascéticas.",
+          "Pela morte de Cristo na cruz, que triunfou sobre os principados e potestades, e pela comunhão diária com Ele.",
+          "Por meio de rituais de exorcismo realizados exclusivamente por pastores ordenados.",
+          "Pelo isolamento total da sociedade em comunidades fechadas."
+        ],
+        answer: 1,
+        explanation: "Conforme Colossenses 2:15 e Efésios 6:12-18, Jesus triunfou sobre os poderes demoníacos na cruz e nos capacita a andar em liberdade, alegria e amor através da comunhão diária com Ele."
+      },
+      {
+        id: 32, block: 4, beliefNum: 11, beliefName: "Crença 11 • Crescimento em Cristo",
+        question: "Quais práticas espirituais são destacadas na Crença 11 como essenciais para o crescimento contínuo do cristão?",
+        options: [
+          "Jejuns prolongados de quarenta dias e peregrinações.",
+          "Comunhão diária por meio da oração, estudo da Palavra de Deus, meditação, louvor, adoração congregacional e serviço missionário.",
+          "Memorização exclusiva de genealogias bíblicas.",
+          "Abstinência completa do convívio familiar."
+        ],
+        answer: 1,
+        explanation: "Segundo Salmo 1:1-2, Mateus 20:25-28 e 1 Tessalonicenses 5:16-18, o crescimento espiritual ocorre na constância da oração, estudo bíblico, adoração e serviço amoroso ao próximo."
+      },
+      {
+        id: 33, block: 4, beliefNum: 11, beliefName: "Crença 11 • Crescimento em Cristo",
+        question: "Ao entregarmos nossa vida ao serviço amoroso pelos que nos rodeiam e ao testemunho da salvação, o que a Crença 11 afirma sobre a presença de Cristo?",
+        options: [
+          "Ele Se afasta para testar nossa autonomia espiritual.",
+          "Sua presença constante conosco através do Espírito transforma cada momento e cada tarefa em experiência espiritual.",
+          "Sua presença limita-se apenas às horas do culto sabático.",
+          "Ele garante isenção total de provações e enfermidades."
+        ],
+        answer: 1,
+        explanation: "Conforme Gálatas 5:22-25 e Mateus 28:20, a habitação constante do Espírito Santo transforma toda a vida cotidiana em serviço e louvor a Deus."
+      },
+
+      // ================= CRENÇA 12: A IGREJA =================
+      {
+        id: 34, block: 4, beliefNum: 12, beliefName: "Crença 12 • A Igreja",
+        question: "Como 'Nisto Cremos' define a Igreja em sua essência bíblica?",
+        options: [
+          "Uma estrutura institucional hierárquica restrita a um edifício sagrado.",
+          "A comunidade de crentes que confessam Jesus Cristo como Senhor e Salvador, chamados do mundo para adoração, comunhão, instrução, serviço e proclamação do evangelho.",
+          "Apenas a nação literal de Israel no Oriente Médio.",
+          "Uma organização filantrópica sem compromisso doutrinário."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Pedro 2:9, Efésios 1:22-23 e Atos 2:42-47, a Igreja (ekklēsia = 'chamados para fora') é o povo de Deus chamado do mundo para viver em comunhão e cumprir a missão de Cristo."
+      },
+      {
+        id: 35, block: 4, beliefNum: 12, beliefName: "Crença 12 • A Igreja",
+        question: "Qual metáfora bíblica destacada na Crença 12 mostra a relação de autoridade e dependência entre Cristo e a Igreja?",
+        options: [
+          "Cristo é o Cabeça da Igreja, e a Igreja é o Seu corpo.",
+          "Cristo é o embaixador e a Igreja é a soberana.",
+          "A Igreja é o fundamento e Cristo é apenas um dos pilares.",
+          "Cristo e a Igreja são duas instituições paralelas."
+        ],
+        answer: 0,
+        explanation: "Conforme Efésios 1:22-23 e Colossenses 1:18, a Igreja recebe sua autoridade de Cristo, a Palavra encarnada, e das Escrituras, a Palavra escrita; Cristo é o Cabeça do corpo."
+      },
+      {
+        id: 36, block: 4, beliefNum: 12, beliefName: "Crença 12 • A Igreja",
+        question: "Na Crença 12, a Igreja é descrita como a família de Deus e a noiva pela qual Cristo morreu. Qual é o destino final dessa Igreja?",
+        options: [
+          "Estabelecer um reino político terrestre antes da volta de Jesus.",
+          "Ser santificada e purificada por Cristo, retornando como a Igreja triunfante, gloriosa e sem mácula na Sua volta.",
+          "Fundir-se com todas as religiões do mundo em um sincretismo universal.",
+          "Desaparecer completamente durante a grande tribulação."
+        ],
+        answer: 1,
+        explanation: "De acordo com Efésios 5:25-27, Cristo purifica a Igreja pela Palavra para apresentá-la a Si mesmo gloriosa, sem mancha nem ruga, na consumação dos séculos."
+      },
+
+      // ================= CRENÇA 13: O REMANESCENTE E SUA MISSÃO =================
+      {
+        id: 37, block: 4, beliefNum: 13, beliefName: "Crença 13 • O Remanescente e sua Missão",
+        question: "Segundo Apocalipse 12:17 e 14:12, quais são as duas marcas identificadoras principais do remanescente do tempo do fim?",
+        options: [
+          "Riqueza material e poder político sobre as nações.",
+          "Guardar os mandamentos de Deus e ter a fé de Jesus (o testemunho de Jesus).",
+          "Realizar sinais espetaculares no céu e falar línguas desconhecidas.",
+          "Habitar exclusivamente na cidade de Jerusalém."
+        ],
+        answer: 1,
+        explanation: "Apocalipse 12:17 e 14:12 descrevem o remanescente como aqueles que 'guardam os mandamentos de Deus e têm o testemunho de Jesus / a fé em Jesus'."
+      },
+      {
+        id: 38, block: 4, beliefNum: 13, beliefName: "Crença 13 • O Remanescente e sua Missão",
+        question: "Qual mensagem profética específica foi confiada ao remanescente para ser proclamada a toda nação, tribo, língua e povo?",
+        options: [
+          "A mensagem dos três anjos de Apocalipse 14:6-12, anunciando a chegada da hora do juízo de Deus e a iminente volta de Cristo.",
+          "Uma mensagem de paz e prosperidade terrena por mil anos antes do retorno de Jesus.",
+          "O retorno aos sacrifícios levíticos do templo de Jerusalém.",
+          "A mensagem de que apenas uma etnia será salva."
+        ],
+        answer: 0,
+        explanation: "A tríplice mensagem angélica de Apocalipse 14:6-12 proclama o evangelho eterno, a chegada do juízo investigativo (1844), a adoração ao Criador (sábado), a queda da Babilônia espiritual e o alerta contra a marca da besta."
+      },
+      {
+        id: 39, block: 4, beliefNum: 13, beliefName: "Crença 13 • O Remanescente e sua Missão",
+        question: "Como 'Nisto Cremos' diferencia a 'Igreja Universal' (invisível) do 'Remanescente Visível'?",
+        options: [
+          "Ninguém fora da estrutura institucional visível pode ser salvo.",
+          "A Igreja Universal abrange todos os que verdadeiramente creem em Cristo em todas as épocas e lugares; o Remanescente Visível foi chamado nos últimos dias para proclamar a restauração da verdade bíblica.",
+          "Não existe qualquer diferença entre os dois conceitos.",
+          "O Remanescente Visível é composto apenas pelos 144 mil israelitas literais."
+        ],
+        answer: 1,
+        explanation: "Deus possui filhos sinceros espalhados em todas as comunhões (João 10:16; Apocalipse 18:4), mas suscitou um movimento profético visível no tempo do fim para chamar Seu povo de volta à plena verdade bíblica."
+      },
+
+      // ================= CRENÇA 14: UNIDADE NO CORPO DE CRISTO =================
+      {
+        id: 40, block: 4, beliefNum: 14, beliefName: "Crença 14 • Unidade no Corpo de Cristo",
+        question: "Qual é o fundamento da verdadeira unidade na Igreja segundo Gálatas 3:28, Efésios 4:3-6 e a Crença 14?",
+        options: [
+          "Uniformidade cultural e imposição de um único idioma litúrgico.",
+          "Nossa união em Cristo Jesus mediante um só Espírito, um só Senhor, uma só fé e um só batismo, superando distinções de raça, cultura, nacionalidade e gênero.",
+          "Acordos ecumênicos que relativizam as doutrinas bíblicas.",
+          "Submissão administrativa a um líder humano infalível."
+        ],
+        answer: 1,
+        explanation: "Em Cristo somos todos iguais e irmãos (Gálatas 3:28), unidos pela verdade bíblica e pelo Espírito Santo na diversidade de dons e culturas para o serviço mútuo."
+      },
+      {
+        id: 41, block: 4, beliefNum: 14, beliefName: "Crença 14 • Unidade no Corpo de Cristo",
+        question: "Segundo a Crença 14, unidade na Igreja significa uniformidade absoluta em todos os detalhes?",
+        options: [
+          "Sim, todos os membros devem exercer exatamente a mesma função.",
+          "Não; assim como um corpo tem muitos membros com funções distintas, a unidade harmoniza a diversidade de dons e ministérios sob a liderança de Cristo.",
+          "Sim, não há espaço para diferentes culturas na adoração.",
+          "Não, cada igreja local pode adotar doutrinas contrárias entre si."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 12:12-27, o corpo é um e tem muitos membros; a unidade preserva a pureza doutrinária enquanto valoriza a diversidade de dons e talentos."
+      },
+      {
+        id: 42, block: 4, beliefNum: 14, beliefName: "Crença 14 • Unidade no Corpo de Cristo",
+        question: "Qual é o impacto evangelístico da unidade dos cristãos, conforme a oração sacerdotal de Jesus em João 17:21-23?",
+        options: [
+          "Demonstrar ao mundo que o Pai enviou Cristo e que o amor de Deus transforma relacionamentos humanos.",
+          "Garantir isenção fiscal para as igrejas.",
+          "Eliminar a necessidade de pregação verbal do evangelho.",
+          "Evitar qualquer tipo de perseguição religiosa."
+        ],
+        answer: 0,
+        explanation: "Jesus orou 'para que todos sejam um... a fim de que o mundo creia que Tu Me enviaste' (João 17:21), tornando a unidade cristã o maior testemunho do poder do evangelho."
+      },
+
+      // ================= CRENÇA 15: O BATISMO =================
+      {
+        id: 43, block: 4, beliefNum: 15, beliefName: "Crença 15 • O Batismo",
+        question: "Qual modo de batismo é praticado e ensinado no livro 'Nisto Cremos' e por quê?",
+        options: [
+          "Aspersão de água na testa, por ser mais prático em qualquer clima.",
+          "Imersão total na água, simbolizando a morte para o pecado, o sepultamento da velha vida e a ressurreição para andar em novidade de vida.",
+          "Derramamento de água (afusão) sobre bebês recém-nascidos.",
+          "Qualquer modo é igualmente bíblico, dependendo da preferência do candidato."
+        ],
+        answer: 1,
+        explanation: "A palavra grega 'baptizo' significa mergulhar/imergir. Conforme Romanos 6:1-6 e Mateus 3:16, a imersão representa perfeitamente a morte, sepultamento e ressurreição com Cristo."
+      },
+      {
+        id: 44, block: 4, beliefNum: 15, beliefName: "Crença 15 • O Batismo",
+        question: "Por que os adventistas do sétimo dia não praticam o batismo infantil?",
+        options: [
+          "Porque consideram que as crianças não precisam da bênção de Deus.",
+          "Porque o batismo bíblico exige arrependimento pessoal, instrução nas Escrituras e confissão consciente de fé em Jesus Cristo.",
+          "Porque apenas adultos acima de 21 anos podem ser salvos.",
+          "Porque o batismo infantil foi praticado apenas pelos apóstolos."
+        ],
+        answer: 1,
+        explanation: "Conforme Mateus 28:19-20 e Atos 2:38, o batismo segue o ensino, o arrependimento e a fé pessoal — requisitos impossíveis para um recém-nascido (para crianças pequenas pratica-se a dedicação ao Senhor)."
+      },
+      {
+        id: 45, block: 4, beliefNum: 15, beliefName: "Crença 15 • O Batismo",
+        question: "Em nome de quem o batismo cristão deve ser administrado, conforme a ordem de Jesus em Mateus 28:19?",
+        options: [
+          "Em nome dos apóstolos e dos profetas.",
+          "Em nome do Pai, e do Filho, e do Espírito Santo.",
+          "Em nome da igreja local.",
+          "Apenas em nome do Espírito Santo."
+        ],
+        answer: 1,
+        explanation: "Mateus 28:19 estabelece explicitamente a fórmula batismal trinitariana: 'batizando-os em nome do Pai, e do Filho, e do Espírito Santo'."
+      },
+
+      // ================= CRENÇA 16: A CEIA DO SENHOR =================
+      {
+        id: 46, block: 4, beliefNum: 16, beliefName: "Crença 16 • A Ceia do Senhor",
+        question: "Qual ordenança preparatória precede o partilhar do pão e do vinho na Ceia do Senhor adventista, conforme João 13?",
+        options: [
+          "A unção com óleo perfumado.",
+          "A cerimônia do lava-pés (ordenança da humildade), simbolizando purificação renovada, reconciliação e disposição para servir uns aos outros.",
+          "A oferta pública de bens materiais.",
+          "Um jejum obrigatório de três dias antes do culto."
+        ],
+        answer: 1,
+        explanation: "Em João 13:1-17, Jesus instituiu o lava-pés como ordenança perpétua de humildade, perdão mútuo e purificação espiritual antes da comunhão."
+      },
+      {
+        id: 47, block: 4, beliefNum: 16, beliefName: "Crença 16 • A Ceia do Senhor",
+        question: "O que representam os emblemas do pão sem fermento e do fruto da videira não fermentado na Ceia do Senhor?",
+        options: [
+          "Transformam-se literalmente na carne e no sangue físicos de Jesus (transubstanciação).",
+          "São símbolos memoriais do corpo partido e do sangue derramado de Cristo, anunciando Sua morte até que Ele venha.",
+          "São apenas elementos decorativos sem significado espiritual.",
+          "Representam a prosperidade agrícola da antiga Palestina."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 11:23-26, o pão ázimo (sem fermento, símbolo da pureza sem pecado) e o suco de uva puro (sem fermentação/corrupção) simbolizam o sacrifício perfeito de Cristo e apontam para Sua volta."
+      },
+      {
+        id: 48, block: 4, beliefNum: 16, beliefName: "Crença 16 • A Ceia do Senhor",
+        question: "Quem pode participar da Ceia do Senhor segundo a prática da Igreja Adventista do Sétimo Dia ('comunhão aberta')?",
+        options: [
+          "Exclusivamente os membros batizados da congregação local.",
+          "Todos os cristãos que creem em Jesus Cristo como seu Salvador pessoal e examinam a si mesmos com reverência.",
+          "Apenas os pastores e anciãos ordenados.",
+          "Somente quem nunca cometeu pecados após o batismo."
+        ],
+        answer: 1,
+        explanation: "A Igreja Adventista pratica a comunhão aberta: qualquer cristão sincero que confia em Cristo como Salvador é convidado a participar após o autoexame recomendado em 1 Coríntios 11:28."
+      },
+
+      // ================= CRENÇA 17: DONS E MINISTÉRIOS ESPIRITUAIS =================
+      {
+        id: 49, block: 4, beliefNum: 17, beliefName: "Crença 17 • Dons e Ministérios Espirituais",
+        question: "Qual é o propósito principal pelo qual Deus concede dons espirituais a todos os membros da Igreja?",
+        options: [
+          "Para promoção pessoal e exibição de superioridade espiritual.",
+          "Para o serviço amoroso em benefício comum da Igreja e da humanidade, visando a edificação do corpo de Cristo.",
+          "Para substituir o estudo sistemático da Bíblia.",
+          "Apenas para entretenimento durante os cultos."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 12:7 e Efésios 4:11-13, os dons são concedidos pelo Espírito Santo 'visando a um fim proveitoso', para equipar os santos para o ministério e edificar a Igreja."
+      },
+      {
+        id: 50, block: 4, beliefNum: 17, beliefName: "Crença 17 • Dons e Ministérios Espirituais",
+        question: "Segundo 1 Coríntios 12:11 e 'Nisto Cremos', quem determina qual dom espiritual cada crente recebe?",
+        options: [
+          "A comissão de nomeações da igreja local.",
+          "O Espírito Santo, distribuindo-os particularmente a cada um conforme Ele quer.",
+          "A herança genética dos pais.",
+          "O nível de escolaridade acadêmica do membro."
+        ],
+        answer: 1,
+        explanation: "O Espírito Santo distribui os dons soberanamente a cada membro conforme Sua vontade e a necessidade da Igreja, de modo que nenhum membro fica sem função nem pode se gloriar."
+      },
+      {
+        id: 51, block: 4, beliefNum: 17, beliefName: "Crença 17 • Dons e Ministérios Espirituais",
+        question: "Sobre o dom de línguas no Novo Testamento, o livro 'Nisto Cremos' esclarece que:",
+        options: [
+          "É a única evidência indispensável do batismo com o Espírito Santo.",
+          "Consistia primariamente na capacidade sobrenatural de falar idiomas humanos reais para pregar o evangelho a povos de outras línguas (como no Pentecostes), devendo sempre haver intérprete na igreja.",
+          "Deve ser praticado simultaneamente por toda a congregação sem interpretação.",
+          "Cessou completamente no primeiro século e jamais poderá ocorrer na missão mundial."
+        ],
+        answer: 1,
+        explanation: "Em Atos 2:4-11 e 1 Coríntios 14:27-28, o dom bíblico de línguas era destinado à comunicação inteligível do evangelho e à edificação ordenada da igreja, jamais à confusão extática."
+      },
+
+      // ================= CRENÇA 18: O DOM DE PROFECIA =================
+      {
+        id: 52, block: 4, beliefNum: 18, beliefName: "Crença 18 • O Dom de Profecia",
+        question: "Como 'Nisto Cremos' define a relação entre os escritos de Ellen G. White e a Bíblia Sagrada?",
+        options: [
+          "Os escritos de Ellen G. White constituem um acréscimo ao cânon bíblico com a mesma autoridade das Escrituras.",
+          "A Bíblia é a norma única pela qual todo ensino e experiência devem ser provados; os escritos de Ellen G. White são uma 'luz menor' que conduz à 'luz maior' (a Bíblia).",
+          "Os escritos de Ellen G. White substituem a necessidade de ler o Antigo Testamento.",
+          "Os escritos de Ellen G. White são meramente opiniões históricas sem inspiração profética."
+        ],
+        answer: 1,
+        explanation: "De acordo com Isaías 8:20 e Apocalipse 19:10, o dom de profecia manifestado no ministério de Ellen G. White é uma fonte contínua e autorizada de verdade que oferece conforto, orientação, instrução e correção, mas permanece sempre submetida à suprema autoridade da Bíblia."
+      },
+      {
+        id: 53, block: 4, beliefNum: 18, beliefName: "Crença 18 • O Dom de Profecia",
+        question: "Qual texto de Apocalipse conecta diretamente a identidade da igreja remanescente com o 'Dom de Profecia'?",
+        options: [
+          "Apocalipse 12:17 combinado com Apocalipse 19:10 ('o testemunho de Jesus é o espírito de profecia').",
+          "Apocalipse 2:10 ('Sê fiel até à morte').",
+          "Apocalipse 21:4 ('E lhes enxugará dos olhos toda lágrima').",
+          "Apocalipse 3:20 ('Eis que estou à porta e bato')."
+        ],
+        answer: 0,
+        explanation: "Apocalipse 12:17 identifica o remanescente pelos que 'têm o testemunho de Jesus', e Apocalipse 19:10 define que 'o testemunho de Jesus é o espírito de profecia'."
+      },
+      {
+        id: 54, block: 4, beliefNum: 18, beliefName: "Crença 18 • O Dom de Profecia",
+        question: "Quais são os quatro testes bíblicos principais apresentados em 'Nisto Cremos' para distinguir um profeta verdadeiro de um falso?",
+        options: [
+          "Riqueza material, popularidade mundial, idade avançada e formação teológica.",
+          "Harmonia com a Lei e o Testemunho (Isaías 8:20), cumprimento das predições (Jeremias 28:9), confissão da encarnação de Cristo (1 João 4:2) e os frutos de sua vida/ministério (Mateus 7:20).",
+          "Capacidade de realizar curas físicas espetaculares e falar idiomas antigos.",
+          "Pertencer exclusivamente à tribo de Levi."
+        ],
+        answer: 1,
+        explanation: "A Bíblia fornece critérios objetivos para provar os espíritos (1 Tessalonicenses 5:20-21; 1 João 4:1): fidelidade às Escrituras, cumprimento profético, cristocentricidade e frutos morais e espirituais."
+      },
+
+      // ================= CRENÇA 19: A LEI DE DEUS =================
+      {
+        id: 55, block: 5, beliefNum: 19, beliefName: "Crença 19 • A Lei de Deus",
+        question: "Qual distinção fundamental o livro 'Nisto Cremos' faz entre a Lei Moral (Dez Mandamentos) e a Lei Cerimonial?",
+        options: [
+          "Ambas foram abolidas na cruz de Cristo, restando apenas o mandamento do amor.",
+          "A Lei Moral reflete o caráter eterno de Deus, foi escrita pelo próprio dedo de Deus em tábuas de pedra e é perpétua; a Lei Cerimonial apontava para o sacrifício de Cristo e cumpriu-se na cruz.",
+          "A Lei Cerimonial permanece obrigatória, enquanto os Dez Mandamentos eram apenas para o deserto.",
+          "Não existe diferença entre lei moral e lei cerimonial no Antigo Testamento."
+        ],
+        answer: 1,
+        explanation: "Conforme Mateus 5:17-19, Romanos 3:31 e Efésios 2:15, os rituais cerimoniais ('ordenanças') cessaram na cruz, enquanto os Dez Mandamentos permanecem eternamente como norma de justiça."
+      },
+      {
+        id: 56, block: 5, beliefNum: 19, beliefName: "Crença 19 • A Lei de Deus",
+        question: "Qual é a função da Lei de Deus na vida do pecador e do crente, segundo Romanos 3:20, 7:7 e Tiago 1:23-25?",
+        options: [
+          "Salvar o ser humano pelo mérito da obediência perfeita.",
+          "Servir como um espelho espiritual que aponta o pecado, revela a vontade de Deus e conduz o pecador a Cristo para receber perdão e poder para obedecer.",
+          "Condenar irremediavelmente quem comete qualquer erro sem oferecer esperança.",
+          "Substituir a obra do Espírito Santo."
+        ],
+        answer: 1,
+        explanation: "O espelho mostra a sujeira, mas não pode lavar o rosto — somente o sangue de Cristo purifica. A lei aponta o pecado e, na Nova Aliança (Hebreus 8:10), é escrita no coração pelo Espírito."
+      },
+      {
+        id: 57, block: 5, beliefNum: 19, beliefName: "Crença 19 • A Lei de Deus",
+        question: "Como Jesus resumiu os Dez Mandamentos em Mateus 22:37-40, conforme comentado na Crença 19?",
+        options: [
+          "Substituindo os dez preceitos por duas sugestões opcionais.",
+          "Sintetizando as duas tábuas da lei: os quatro primeiros mandamentos expressam o amor supremo a Deus, e os seis últimos expressam o amor ao próximo.",
+          "Reduzindo a lei apenas aos mandamentos civis de Israel.",
+          "Declarando que amar basta, mesmo que se transgrida o sábado ou se adore ídolos."
+        ],
+        answer: 1,
+        explanation: "O amor é o cumprimento da lei (Romanos 13:10), não a sua abolição. Os Dez Mandamentos detalham como amar a Deus (mandamentos 1–4) e ao próximo (mandamentos 5–10)."
+      },
+
+      // ================= CRENÇA 20: O SÁBADO =================
+      {
+        id: 58, block: 5, beliefNum: 20, beliefName: "Crença 20 • O Sábado",
+        question: "Quando e como o sábado foi instituído, segundo Gênesis 2:1-3 e a Crença 20?",
+        options: [
+          "No Monte Sinai, mais de dois mil anos depois da Criação, exclusivamente para o povo judeu.",
+          "No final da semana da Criação, antes da entrada do pecado, quando Deus descansou, abençoou e santificou o sétimo dia para toda a humanidade.",
+          "Pelos apóstolos após a ressurreição de Cristo.",
+          "Pelo imperador Constantino no século IV."
+        ],
+        answer: 1,
+        explanation: "Conforme Gênesis 2:1-3 e Marcos 2:27 ('O sábado foi estabelecido por causa do homem'), o sábado é uma instituição edênica universal, anterior ao povo judeu."
+      },
+      {
+        id: 59, block: 5, beliefNum: 20, beliefName: "Crença 20 • O Sábado",
+        question: "De acordo com Êxodo 20:8-11 e Deuteronômio 5:12-15, o sábado possui um duplo significado memorial. Qual é ele?",
+        options: [
+          "Memorial do nascimento de Moisés e da conquista de Jericó.",
+          "Memorial da Criação de Deus e memorial da Redenção/libertação da escravidão do pecado.",
+          "Memorial da destruição de Sodoma e do dilúvio.",
+          "Memorial da entrada de Jesus em Jerusalém e do Pentecostes."
+        ],
+        answer: 1,
+        explanation: "Em Êxodo 20:11 o sábado celebra Deus como Criador; em Deuteronômio 5:15 celebra Deus como Redentor que liberta da escravidão — ambos realizados por meio de Jesus Cristo."
+      },
+      {
+        id: 60, block: 5, beliefNum: 20, beliefName: "Crença 20 • O Sábado",
+        question: "Conforme Levítico 23:32 e o exemplo bíblico, quais são os limites horários da observância do sábado?",
+        options: [
+          "Da meia-noite de sexta-feira à meia-noite de sábado.",
+          "Do pôr do sol de sexta-feira ao pôr do sol de sábado.",
+          "Do nascer ao pôr do sol de sábado.",
+          "Apenas durante o horário do culto matutino."
+        ],
+        answer: 1,
+        explanation: "Seguindo o padrão bíblico da criação ('houve tarde e manhã') e Levítico 23:32 ('de uma tarde a outra tarde celebrareis o vosso sábado'), o sábado inicia-se no pôr do sol da sexta-feira e encerra-se no pôr do sol do sábado."
+      },
+
+      // ================= CRENÇA 21: MORDOMIA =================
+      {
+        id: 61, block: 5, beliefNum: 21, beliefName: "Crença 21 • Mordomia",
+        question: "Qual é o conceito abrangente de 'Mordomia Cristã' apresentado na Crença 21 do livro 'Nisto Cremos'?",
+        options: [
+          "Refere-se exclusivamente à devolução financeira de dízimos e ofertas.",
+          "Reconhecer que Deus é o Proprietário de tudo, sendo nós Seus administradores responsáveis pelo tempo, oportunidades, capacidades, posses, corpo e cuidados com a Terra.",
+          "Significa doar todos os bens à igreja e viver em pobreza extrema.",
+          "É uma responsabilidade restrita aos tesoureiros e pastores."
+        ],
+        answer: 1,
+        explanation: "Conforme Salmo 24:1 e 1 Pedro 4:10, mordomia abrange toda a vida: somos despenseiros de Deus sobre nosso corpo, tempo, talentos, recursos financeiros e meio ambiente."
+      },
+      {
+        id: 62, block: 5, beliefNum: 21, beliefName: "Crença 21 • Mordomia",
+        question: "De acordo com Malaquias 3:8-10, Levítico 27:30 e a Crença 21, como se distinguem o dízimo e as ofertas?",
+        options: [
+          "Ambos são percentuais fixos de 10% destinados à construção de templos.",
+          "O dízimo (décima parte de toda renda/acréscimo) é santo ao Senhor e destinado ao sustento do ministério evangélico; as ofertas são contribuições voluntárias proporcionais às bênçãos recebidas.",
+          "O dízimo era obrigatório apenas no Antigo Testamento, enquanto hoje existem apenas ofertas.",
+          "O dízimo pode ser gasto livremente pelo membro em projetos sociais particulares."
+        ],
+        answer: 1,
+        explanation: "Conforme Malaquias 3:8-10 e 1 Coríntios 9:13-14, o dízimo pertence a Deus e sustenta a pregação do evangelho, enquanto as ofertas expressam gratidão voluntária e apoiam a missão local e mundial."
+      },
+      {
+        id: 63, block: 5, beliefNum: 21, beliefName: "Crença 21 • Mordomia",
+        question: "Qual princípio espiritual Jesus afirmou em Mateus 6:21 sobre a relação entre nossos recursos e nossa vida espiritual?",
+        options: [
+          "'Onde está o teu tesouro, aí estará também o teu coração.'",
+          "'A riqueza material é o sinal infalível da aprovação divina.'",
+          "'O dinheiro é intrinsecamente mau e deve ser evitado.'",
+          "'Quem contribui financeiramente garante seu lugar no céu.'"
+        ],
+        answer: 0,
+        explanation: "A mordomia fiel não visa comprar bênçãos, mas liberta o coração do egoísmo e da cobiça, alinhando nossas prioridades com o reino de Deus (Mateus 6:19-21, 33)."
+      },
+
+      // ================= CRENÇA 22: CONDUTA CRISTÃ =================
+      {
+        id: 64, block: 5, beliefNum: 22, beliefName: "Crença 22 • Conduta Cristã",
+        question: "Qual é o fundamento bíblico para os princípios adventistas de saúde e temperança apresentados na Crença 22?",
+        options: [
+          "A busca por mérito diante de Deus através de dietas rigorosas.",
+          "O fato de que nosso corpo é o templo do Espírito Santo (1 Coríntios 6:19-20), devendo ser cuidado inteligentemente para honrar a Deus e manter clareza mental.",
+          "A crença pagã de que a matéria e o corpo são maus.",
+          "Apenas recomendações médicas temporárias do século XIX."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Coríntios 6:19-20 e 10:31 ('quer comais, quer bebais ou façais outra coisa qualquer, fazei tudo para a glória de Deus'), a saúde física, mental e espiritual estão interligadas."
+      },
+      {
+        id: 65, block: 5, beliefNum: 22, beliefName: "Crença 22 • Conduta Cristã",
+        question: "Sobre alimentação e substâncias prejudiciais, o que ensina a Crença 22 ('Conduta Cristã')?",
+        options: [
+          "Abstinência de bebidas alcoólicas, fumo e drogas, e abstenção dos alimentos imundos especificados nas Escrituras (Levítico 11), adotando a dieta mais saudável possível.",
+          "Consumo moderado de álcool e alimentos imundos desde que se ore antes das refeições.",
+          "Proibição absoluta de qualquer alimento cozido.",
+          "Obrigatoriedade de jejum semanal para obter perdão."
+        ],
+        answer: 0,
+        explanation: "Em harmonia com Levítico 11, Deuteronômio 14 e 1 Coríntios 3:16-17, abstemo-nos de álcool, tabaco, narcóticos e carnes imundas, privilegiando a dieta original mais saudável."
+      },
+      {
+        id: 66, block: 5, beliefNum: 22, beliefName: "Crença 22 • Conduta Cristã",
+        question: "Quais critérios bíblicos orientam o cristão quanto ao vestuário, lazer, música e entretenimento segundo a Crença 22?",
+        options: [
+          "Seguir todas as tendências da moda e da mídia para não parecer diferente da sociedade.",
+          "Cultivar a modéstia, simplicidade, pureza e beleza genuína que não consiste em adornos exteriores ostentosos, buscando recreações que elevem a mente a Cristo.",
+          "Usar exclusivamente roupas uniformes de cor escura.",
+          "Evitar toda forma de música, esporte ou contato com a natureza."
+        ],
+        answer: 1,
+        explanation: "Conforme 1 Pedro 3:3-4, 1 Timóteo 2:9-10 e Filipenses 4:8, o estilo de vida cristão reflete modéstia, equilíbrio, pureza e tudo o que é verdadeiro, respeitável, justo e amável."
+      },
+
+      // ================= CRENÇA 23: MATRIMÔNIO E FAMÍLIA =================
+      {
+        id: 67, block: 5, beliefNum: 23, beliefName: "Crença 23 • Matrimônio e Família",
+        question: "Como 'Nisto Cremos' define a origem e o padrão bíblico do matrimônio?",
+        options: [
+          "Um contrato civil meramente humano sujeito às conveniências culturais de cada época.",
+          "Uma instituição divina estabelecida no Éden e confirmada por Jesus como a união vitalícia entre um homem e uma mulher em companheirismo amoroso.",
+          "Uma concessão inferior permitida apenas aos que não conseguem viver o celibato.",
+          "Uma aliança temporária que se encerra automaticamente após a criação dos filhos."
+        ],
+        answer: 1,
+        explanation: "Conforme Gênesis 2:18-24 e Mateus 19:4-6, o casamento foi instituído por Deus na Criação como uma união monogâmica, heterossexual e vitalícia ('uma só carne')."
+      },
+      {
+        id: 68, block: 5, beliefNum: 23, beliefName: "Crença 23 • Matrimônio e Família",
+        question: "De acordo com Efésios 5:21-33 e a Crença 23, qual modelo deve guiar o relacionamento entre marido e mulher?",
+        options: [
+          "Domínio autoritário do marido e submissão servil da esposa.",
+          "Submissão mútua no temor de Cristo: o marido ama a esposa como Cristo amou a Igreja e Se entregou por ela, e ambos se respeitam e apoiam mutuamente.",
+          "Independência total sem prestação de contas mútua.",
+          "Prioridade absoluta da carreira profissional acima da família."
+        ],
+        answer: 1,
+        explanation: "Efésios 5:21-28 estabelece a mutualidade sacrificial no amor de Cristo como o padrão mais elevado para o lar cristão."
+      },
+      {
+        id: 69, block: 5, beliefNum: 23, beliefName: "Crença 23 • Matrimônio e Família",
+        question: "Qual responsabilidade fundamental os pais têm na educação dos filhos, segundo Deuteronômio 6:6-7, Provérbios 22:6 e a Crença 23?",
+        options: [
+          "Delegar toda a formação espiritual exclusivamente à escola sabatina infantil.",
+          "Ensinar os filhos a amar e obedecer ao Senhor por meio do exemplo diário e de palavras amorosas, preparando-os para uma vida útil e para o reino de Deus.",
+          "Impor a fé pela força física sem diálogo.",
+          "Aguardar que os filhos cheguem à idade adulta antes de falar sobre Deus."
+        ],
+        answer: 1,
+        explanation: "A família é o núcleo primário da igreja, onde os pais modelam o caráter de Cristo e conduzem os filhos ao relacionamento pessoal com o Salvador."
+      },
+
+      // ================= CRENÇA 24: MINISTÉRIO DE CRISTO NO SANTUÁRIO CELESTIAL =================
+      {
+        id: 70, block: 6, beliefNum: 24, beliefName: "Crença 24 • Ministério de Cristo no Santuário Celestial",
+        question: "De acordo com Hebreus 8:1-5 e a Crença 24, qual era a relação entre o santuário terrestre construído por Moisés e o santuário celestial?",
+        options: [
+          "O santuário celestial é uma metáfora simbólica criada após a destruição do templo de Herodes.",
+          "O santuário terrestre era uma cópia e sombra do verdadeiro tabernáculo no Céu, onde Cristo ministra como nosso Sumo Sacerdote.",
+          "Ambos os santuários funcionam simultaneamente hoje.",
+          "O santuário terrestre era superior ao celestial por ter a arca da aliança."
+        ],
+        answer: 1,
+        explanation: "Hebreus 8:1-2, 5 ensina que Jesus é Ministro do verdadeiro tabernáculo que o Senhor erigiu no Céu, do qual o santuário terrestre era figura e sombra."
+      },
+      {
+        id: 71, block: 6, beliefNum: 24, beliefName: "Crença 24 • Ministério de Cristo no Santuário Celestial",
+        question: "O que ocorreu em 1844, no fim do período profético dos 2.300 tardes e manhãs de Daniel 8:14, segundo 'Nisto Cremos'?",
+        options: [
+          "Jesus voltou secretamente à Terra para estabelecer Seu reino invisível.",
+          "Cristo entrou na segunda e última fase de Seu ministério expiatório no Lugar Santíssimo do santuário celestial, iniciando o Juízo Investigativo.",
+          "O tempo da graça encerrou-se definitivamente para toda a humanidade.",
+          "A igreja adventista foi fundada como uma denominação fechada."
+        ],
+        answer: 1,
+        explanation: "Em 1844 (fim dos 2.300 anos de Daniel 8:14), cumpriu-se o antítipo do Dia da Expiação (Levítico 16): Cristo iniciou a obra de juízo investigativo no Lugar Santíssimo, que precede Sua segunda vinda."
+      },
+      {
+        id: 72, block: 6, beliefNum: 24, beliefName: "Crença 24 • Ministério de Cristo no Santuário Celestial",
+        question: "Qual é o objetivo do Juízo Investigativo pré-advento descrito na Crença 24?",
+        options: [
+          "Informar a Deus quem são os salvos, já que Ele não saberia sem consultar os livros.",
+          "Demonstrar perante os seres celestiais quais dentre os mortos e os vivos dormem em Cristo e são dignos de participar da primeira ressurreição, vindicando a justiça de Deus.",
+          "Conceder uma segunda oportunidade de arrependimento aos mortos ímpios.",
+          "Substituir o sacrifício de Cristo na cruz."
+        ],
+        answer: 1,
+        explanation: "Conforme Daniel 7:9-10, 22 e Apocalipse 14:7, o juízo pré-advento revela a todo o universo a justiça e a misericórdia de Deus ao confirmar os que permanecem unidos a Cristo pela fé."
+      },
+
+      // ================= CRENÇA 25: A SEGUNDA VINDA DE CRISTO =================
+      {
+        id: 73, block: 6, beliefNum: 25, beliefName: "Crença 25 • A Segunda Vinda de Cristo",
+        question: "Quais são as características essenciais da Segunda Vinda de Cristo conforme Mateus 24:27, Atos 1:11, Apocalipse 1:7 e a Crença 25?",
+        options: [
+          "Secreta, silenciosa e restrita aos crentes que estiverem orando nos templos.",
+          "Literal, pessoal, visível a todo olho e audível mundialmente, acompanhada por todos os santos anjos.",
+          "Espiritual, simbolizando apenas o avanço da ética cristã na sociedade.",
+          "Em duas etapas separadas por sete anos de tribulação após o arrebatamento secreto."
+        ],
+        answer: 1,
+        explanation: "A Bíblia rejeita qualquer arrebatamento secreto: Jesus virá literalmente nas nuvens, visível como o relâmpago (Mateus 24:27), 'todo olho O verá' (Apocalipse 1:7) e ao som da trombeta de Deus (1 Tessalonicenses 4:16)."
+      },
+      {
+        id: 74, block: 6, beliefNum: 25, beliefName: "Crença 25 • A Segunda Vinda de Cristo",
+        question: "Sobre o dia e a hora exatos da Segunda Vinda de Jesus, o livro 'Nisto Cremos' ensina que:",
+        options: [
+          "Podem ser calculados matematicamente pelas profecias de Daniel e Apocalipse.",
+          "Não foram revelados a ninguém (Mateus 24:36), mas o cumprimento dos sinais dos tempos indica que Sua vinda está muito próxima, exortando-nos a estar sempre preparados.",
+          "Foram revelados exclusivamente aos profetas modernos.",
+          "Ocorrerão somente depois que todo o mundo se converter ao evangelho."
+        ],
+        answer: 1,
+        explanation: "Mateus 24:36 afirma que daquele dia e hora ninguém sabe, senão o Pai; contudo, os sinais proféticos (Mateus 24; Lucas 21; 2 Timóteo 3) mostram que estamos no tempo do fim."
+      },
+      {
+        id: 75, block: 6, beliefNum: 25, beliefName: "Crença 25 • A Segunda Vinda de Cristo",
+        question: "O que acontece com os justos vivos e os ímpios vivos no exato momento da Segunda Vinda de Cristo?",
+        options: [
+          "Os justos vivos são transformados e arrebatados ao encontro do Senhor nos ares junto com os justos ressuscitados, enquanto os ímpios vivos são destruídos pelo resplendor da Sua glória.",
+          "Todos os seres humanos permanecem vivos na Terra para serem governados por Cristo por mil anos.",
+          "Os ímpios vivos recebem mais sete anos para se arrependerem.",
+          "Os justos vivos permanecem na Terra reconstruindo Jerusalém."
+        ],
+        answer: 0,
+        explanation: "Conforme 1 Tessalonicenses 4:16-17, 1 Coríntios 15:51-54 e 2 Tessalonicenses 1:7-9 / 2:8, os justos recebem a imortalidade e sobem ao Céu com Cristo, enquanto os ímpios morrem diante da glória de Sua vinda."
+      },
+
+      // ================= CRENÇA 26: MORTE E RESSURREIÇÃO =================
+      {
+        id: 76, block: 6, beliefNum: 26, beliefName: "Crença 26 • Morte e Ressurreição",
+        question: "Qual é o estado dos mortos entre o falecimento e a ressurreição, segundo Eclesiastes 9:5, Salmo 146:4, João 11:11-14 e a Crença 26?",
+        options: [
+          "Os justos vão imediatamente para o Céu e os ímpios vão imediatamente para o inferno de fogo.",
+          "A morte é um estado de total inconsciência (um sono profundo) para todas as pessoas, sem pensamentos, sentimentos ou comunicação com os vivos.",
+          "Os mortos passam por um estágio intermediário de purificação pelo sofrimento.",
+          "As almas dos mortos reencarnam em novos corpos para evoluir espiritualmente."
+        ],
+        answer: 1,
+        explanation: "'Os mortos não sabem coisa nenhuma' (Eclesiastes 9:5). A morte é comparada por Jesus a um sono (João 11:11) até o despertar na ressurreição."
+      },
+      {
+        id: 77, block: 6, beliefNum: 26, beliefName: "Crença 26 • Morte e Ressurreição",
+        question: "De acordo com João 5:28-29, Apocalipse 20:5-6 e a Crença 26, quando ocorrem as duas ressurreições?",
+        options: [
+          "Ambas ocorrem simultaneamente no dia do juízo final.",
+          "A primeira ressurreição (dos justos) ocorre na Segunda Vinda de Cristo; a segunda ressurreição (dos ímpios) ocorre mil anos depois, ao final do milênio.",
+          "A primeira ocorreu na ascensão de Cristo e a segunda ocorre a cada geração.",
+          "Não haverá ressurreição física dos ímpios, pois deixam de existir na primeira morte."
+        ],
+        answer: 1,
+        explanation: "Apocalipse 20:5-6 distingue claramente a primeira ressurreição ('Bem-aventurado e santo é aquele que tem parte na primeira ressurreição') da ressurreição dos demais mortos, que ocorre somente depois de se cumprirem os mil anos."
+      },
+      {
+        id: 78, block: 6, beliefNum: 26, beliefName: "Crença 26 • Morte e Ressurreição",
+        question: "Quando os seres humanos redimidos recebem o dom da imortalidade, segundo 1 Timóteo 6:16 e 1 Coríntios 15:51-54?",
+        options: [
+          "No nascimento físico, pois toda alma humana já nasce imortal.",
+          "No momento do batismo nas águas.",
+          "Na Segunda Vinda de Cristo, quando este corpo corruptível se revestir da incorruptibilidade e da imortalidade.",
+          "Apenas após o término dos mil anos no Céu."
+        ],
+        answer: 2,
+        explanation: "Apenas Deus possui imortalidade inerente (1 Timóteo 6:16). Os salvos recebem a imortalidade como dom na Segunda Vinda de Cristo (1 Coríntios 15:53-54)."
+      },
+
+      // ================= CRENÇA 27: O MILÊNIO E O FIM DO PECADO =================
+      {
+        id: 79, block: 6, beliefNum: 27, beliefName: "Crença 27 • O Milênio e o Fim do Pecado",
+        question: "Onde estarão os santos redimidos e qual será a condição da Terra durante os mil anos (o Milênio) de Apocalipse 20?",
+        options: [
+          "Os santos estarão na Terra governando as nações ímpias sobreviventes.",
+          "Os santos estarão no Céu reinando com Cristo e participando do juízo de revisão; a Terra ficará completamente desolada, sem habitantes humanos vivos, servindo de prisão ('abismo') para Satanás e seus anjos.",
+          "Satanás estará acorrentado no centro da Terra enquanto os santos reconstroem Jerusalém.",
+          "Os santos estarão dormindo no Céu sem qualquer atividade."
+        ],
+        answer: 1,
+        explanation: "Conforme Apocalipse 20:1-4 e Jeremias 4:23-26, os salvos sobem ao Céu na Segunda Vinda e julgam os ímpios e os anjos caídos durante mil anos, enquanto Satanás fica preso às circunstâncias nesta Terra desolada."
+      },
+      {
+        id: 80, block: 6, beliefNum: 27, beliefName: "Crença 27 • O Milênio e o Fim do Pecado",
+        question: "O que acontece ao término dos mil anos, segundo Apocalipse 20:7-15 e a Crença 27?",
+        options: [
+          "Cristo desce com Seus santos e a Nova Jerusalém à Terra; os ímpios são ressuscitados, Satanás os engana para cercarem a Cidade Santa, mas desce fogo do Céu que os consome e purifica a Terra.",
+          "Satanás e os ímpios finalmente se arrependem e são salvos por Deus.",
+          "Os ímpios passam a sofrer eternamente sem jamais morrer no fogo.",
+          "A Terra é abandonada para sempre no espaço."
+        ],
+        answer: 0,
+        explanation: "Ao fim do milênio ocorre o Juízo Executivo (o trono branco, Apocalipse 20:11-15). Satanás, seus anjos e os ímpios impenitentes sofrem a 'segunda morte' (aniquilação total e definitiva, Malaquias 4:1-3), erradicando para sempre o pecado."
+      },
+      {
+        id: 81, block: 6, beliefNum: 27, beliefName: "Crença 27 • O Milênio e o Fim do Pecado",
+        question: "De acordo com 'Nisto Cremos', o que significa a expressão bíblica 'fogo eterno' aplicada ao castigo final dos ímpios (Judas 7; Malaquias 4:1)?",
+        options: [
+          "Que os perdidos queimarão conscientemente por bilhões de anos sem nunca morrer.",
+          "Que os resultados e consequências da destruição pelo fogo são eternos e irreversíveis (reduzindo-os a cinzas), harmonizando a justiça de Deus com Seu caráter amoroso.",
+          "Que o fogo não tem calor real, sendo apenas remorso psicológico.",
+          "Que o purgatório dura até que as dívidas sejam pagas."
+        ],
+        answer: 1,
+        explanation: "Judas 7 cita Sodoma e Gomorra como exemplo do 'fogo eterno' — cidades que não estão queimando hoje, mas cujas cinzas e destruição são eternas. A Bíblia ensina o aniquilamento final dos ímpios, não o tormento consciente eterno."
+      },
+
+      // ================= CRENÇA 28: A NOVA TERRA =================
+      {
+        id: 82, block: 6, beliefNum: 28, beliefName: "Crença 28 • A Nova Terra",
+        question: "De acordo com 2 Pedro 3:13, Apocalipse 21:1-5 e a Crença 28, onde será o lar eterno dos remidos?",
+        options: [
+          "Um reino puramente imaterial flutuando nas nuvens sem existência física.",
+          "Na Nova Terra recriada por Deus após a purificação pelo fogo, na qual habita justiça e para onde desce a Nova Jerusalém.",
+          "Em um planeta distante fora do sistema solar.",
+          "Na Terra atual sem necessidade de recriação."
+        ],
+        answer: 1,
+        explanation: "Conforme Isaías 65:17, 2 Pedro 3:13 e Apocalipse 21:1-3, Deus criará novos céus e nova terra, e o próprio tabernáculo de Deus estará com os homens na Terra restaurada."
+      },
+      {
+        id: 83, block: 6, beliefNum: 28, beliefName: "Crença 28 • A Nova Terra",
+        question: "Quais realidades serão abolidas para sempre na Nova Terra segundo Apocalipse 21:4 e Naum 1:9?",
+        options: [
+          "O trabalho criativo, o estudo e o convívio social.",
+          "A morte, o luto, o pranto, a dor, o pecado e os pecadores — a aflição não se levantará duas vezes.",
+          "A celebração do sábado e o louvor congregacional.",
+          "A individualidade e a memória das pessoas amadas."
+        ],
+        answer: 1,
+        explanation: "Apocalipse 21:4 promete que Deus enxugará toda lágrima e não haverá mais morte, pranto nem dor; e Naum 1:9 garante que o pecado jamais surgirá uma segunda vez."
+      },
+      {
+        id: 84, block: 6, beliefNum: 28, beliefName: "Crença 28 • A Nova Terra",
+        question: "Como será a vida eterna dos salvos na Nova Terra segundo Isaías 65:21-23 e a Crença 28?",
+        options: [
+          "Uma eternidade de ociosidade passiva tocando harpas.",
+          "Uma existência real, ativa e jubilosa de comunhão face a face com Deus, estudo contínuo do Seu amor, construção, cultivo e adoração sabática eterna.",
+          "Um retorno à ignorância infantil sem desenvolvimento intelectual.",
+          "Uma existência restrita apenas ao interior das muralhas da cidade."
+        ],
+        answer: 1,
+        explanation: "Conforme Isaías 65:21-23 e 66:22-23, os remidos edificarão casas, plantarão vinhas, adorarão a Deus de sábado em sábado e crescerão eternamente no conhecimento e no amor de Deus."
+      }
+    ];
+
+    // =========================================================================
+    // ESTADO DA APLICAÇÃO
+    // =========================================================================
+    let selectedMode = 'full';
+    let examQuestions = [];
+    let userAnswers = {}; // { questionIndex: optionIndex }
+    let currentIndex = 0;
+    let timerInterval = null;
+    let elapsedSeconds = 0;
+    let timerEnabled = true;
+
+    // =========================================================================
+    // FUNÇÕES DE CONFIGURAÇÃO INICIAL
+    // =========================================================================
+    function selectMode(mode) {
+      selectedMode = mode;
+      document.querySelectorAll('.mode-card').forEach(card => {
+        card.classList.remove('border-dbv-navy', 'bg-blue-50/60');
+        card.classList.add('border-slate-200', 'bg-white');
+        const dot = card.querySelector('span:last-child');
+        dot.className = 'w-4 h-4 rounded-full border-2 border-slate-300';
+      });
+
+      const activeCard = document.getElementById(`mode-${mode}`);
+      activeCard.classList.remove('border-slate-200', 'bg-white');
+      activeCard.classList.add('border-dbv-navy', 'bg-blue-50/60');
+      const activeDot = activeCard.querySelector('span:last-child');
+      activeDot.className = 'w-4 h-4 rounded-full border-4 border-dbv-navy bg-white';
+
+      const blockContainer = document.getElementById('block-selector-container');
+      if (mode === 'block') {
+        blockContainer.classList.remove('hidden');
+      } else {
+        blockContainer.classList.add('hidden');
+      }
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function startExam() {
+      const shouldShuffle = document.getElementById('opt-shuffle').checked;
+      timerEnabled = document.getElementById('opt-timer').checked;
+
+      if (selectedMode === 'full') {
+        examQuestions = [...QUESTION_BANK];
+      } else if (selectedMode === 'quick') {
+        // Amostragem estratificada equilibrada entre os 6 blocos (total 30 questões)
+        const quotas = { 1: 6, 2: 3, 3: 4, 4: 7, 5: 5, 6: 5 };
+        let picked = [];
+        for (let b = 1; b <= 6; b++) {
+          const blockPool = shuffleArray(QUESTION_BANK.filter(q => q.block === b));
+          picked = picked.concat(blockPool.slice(0, quotas[b]));
+        }
+        examQuestions = picked;
+      } else if (selectedMode === 'block') {
+        const chosenBlock = parseInt(document.getElementById('block-select').value, 10);
+        examQuestions = QUESTION_BANK.filter(q => q.block === chosenBlock);
+      }
+
+      if (shouldShuffle) {
+        examQuestions = shuffleArray(examQuestions);
+      }
+
+      userAnswers = {};
+      currentIndex = 0;
+      elapsedSeconds = 0;
+
+      // Atualizar UI
+      document.getElementById('setup-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('exam-screen').classList.remove('hidden');
+      document.getElementById('exam-status-bar').classList.remove('hidden');
+      document.getElementById('progress-track').classList.remove('hidden');
+      document.getElementById('total-questions-count').textContent = examQuestions.length;
+
+      // Iniciar cronômetro
+      clearInterval(timerInterval);
+      const timerContainer = document.getElementById('timer-container');
+      if (timerEnabled) {
+        timerContainer.classList.remove('hidden');
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          elapsedSeconds++;
+          updateTimerDisplay();
+        }, 1000);
+      } else {
+        timerContainer.classList.add('hidden');
+      }
+
+      buildQuestionGrid();
+      renderQuestion();
+      updateProgress();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateTimerDisplay() {
+      const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+      const secs = String(elapsedSeconds % 60).padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${mins}:${secs}`;
+    }
+
+    function formatDuration(totalSec) {
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      if (mins === 0) return `${secs}s`;
+      return `${mins}min ${String(secs).padStart(2, '0')}s`;
+    }
+
+    // =========================================================================
+    // NAVEGAÇÃO E RENDERIZAÇÃO DAS QUESTÕES
+    // =========================================================================
+    function renderQuestion() {
+      const q = examQuestions[currentIndex];
+      const letters = ['A', 'B', 'C', 'D'];
+
+      document.getElementById('q-number-badge').textContent = `Questão ${currentIndex + 1} de ${examQuestions.length}`;
+      document.getElementById('q-belief-badge').textContent = q.beliefName;
+      document.getElementById('q-block-label').textContent = BLOCK_NAMES[q.block];
+      document.getElementById('q-text').textContent = q.question;
+
+      const optionsContainer = document.getElementById('q-options');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((optText, idx) => {
+        const isSelected = userAnswers[currentIndex] === idx;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.onclick = () => selectAnswer(idx);
+
+        btn.className = isSelected
+          ? 'w-full text-left p-4 rounded-xl border-2 border-dbv-navy bg-blue-50/80 shadow-sm transition flex items-start gap-3.5'
+          : 'w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition flex items-start gap-3.5';
+
+        const badgeClass = isSelected
+          ? 'w-7 h-7 rounded-lg bg-dbv-navy text-white font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5'
+          : 'w-7 h-7 rounded-lg bg-slate-100 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5';
+
+        btn.innerHTML = `
+          <span class="${badgeClass}">${letters[idx]}</span>
+          <span class="text-sm sm:text-base text-slate-800 leading-relaxed ${isSelected ? 'font-semibold' : ''}">${optText}</span>
+        `;
+        optionsContainer.appendChild(btn);
+      });
+
+      document.getElementById('btn-prev').disabled = currentIndex === 0;
+      const nextBtn = document.getElementById('btn-next');
+      if (currentIndex === examQuestions.length - 1) {
+        nextBtn.innerHTML = `Revisar & Finalizar`;
+        nextBtn.classList.remove('bg-dbv-navy', 'hover:bg-dbv-navyLight');
+        nextBtn.classList.add('bg-dbv-orange', 'hover:bg-dbv-orangeHover');
+        nextBtn.onclick = requestFinishExam;
+      } else {
+        nextBtn.innerHTML = `Próxima <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>`;
+        nextBtn.classList.remove('bg-dbv-orange', 'hover:bg-dbv-orangeHover');
+        nextBtn.classList.add('bg-dbv-navy', 'hover:bg-dbv-navyLight');
+        nextBtn.onclick = nextQuestion;
+      }
+
+      updateQuestionGridHighlight();
+    }
+
+    function selectAnswer(optionIndex) {
+      userAnswers[currentIndex] = optionIndex;
+      renderQuestion();
+      updateProgress();
+    }
+
+    function clearCurrentAnswer() {
+      delete userAnswers[currentIndex];
+      renderQuestion();
+      updateProgress();
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < examQuestions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      currentIndex = idx;
+      renderQuestion();
+    }
+
+    function buildQuestionGrid() {
+      const grid = document.getElementById('question-grid');
+      grid.innerHTML = '';
+      examQuestions.forEach((_, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = `grid-btn-${idx}`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => jumpToQuestion(idx);
+        grid.appendChild(btn);
+      });
+      updateQuestionGridHighlight();
+    }
+
+    function updateQuestionGridHighlight() {
+      examQuestions.forEach((_, idx) => {
+        const btn = document.getElementById(`grid-btn-${idx}`);
+        if (!btn) return;
+        const isAnswered = userAnswers[idx] !== undefined;
+        const isCurrent = idx === currentIndex;
+
+        let classes = 'h-8 w-full rounded-lg text-xs font-bold transition flex items-center justify-center ';
+        if (isAnswered) {
+          classes += 'bg-dbv-navy text-white ';
+        } else {
+          classes += 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 ';
+        }
+        if (isCurrent) {
+          classes += 'ring-2 ring-dbv-orange ring-offset-1 ';
+        }
+        btn.className = classes;
+      });
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(userAnswers).length;
+      const total = examQuestions.length;
+      const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+
+      document.getElementById('answered-count').textContent = answered;
+      document.getElementById('nav-summary-text').textContent = `${answered} de ${total} respondidas`;
+      document.getElementById('progress-fill').style.width = `${pct}%`;
+    }
+
+    // =========================================================================
+    // FINALIZAÇÃO E CORREÇÃO
+    // =========================================================================
+    function requestFinishExam() {
+      const answered = Object.keys(userAnswers).length;
+      const total = examQuestions.length;
+      const unanswered = total - answered;
+
+      let msg = `Você respondeu <strong>${answered}</strong> de <strong>${total}</strong> questões.`;
+      if (unanswered > 0) {
+        msg += ` Ainda restam <strong class="text-dbv-orange">${unanswered} questão(ões) em branco</strong> (que contarão como erro).`;
+      }
+      msg += ` Deseja entregar a prova e visualizar sua nota agora?`;
+
+      document.getElementById('confirm-modal-msg').innerHTML = msg;
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    function finalizeExam() {
+      closeConfirmModal();
+      clearInterval(timerInterval);
+
+      let correctCount = 0;
+      let wrongCount = 0;
+      let blankCount = 0;
+
+      const blockStats = {};
+      for (let b = 1; b <= 6; b++) {
+        blockStats[b] = { total: 0, correct: 0 };
+      }
+
+      examQuestions.forEach((q, idx) => {
+        blockStats[q.block].total++;
+        const userAns = userAnswers[idx];
+        if (userAns === undefined) {
+          blankCount++;
+        } else if (userAns === q.answer) {
+          correctCount++;
+          blockStats[q.block].correct++;
+        } else {
+          wrongCount++;
+        }
+      });
+
+      const total = examQuestions.length;
+      const grade = total > 0 ? ((correctCount / total) * 10) : 0;
+      const approved = grade >= 7.0;
+
+      // Alternar telas
+      document.getElementById('exam-screen').classList.add('hidden');
+      document.getElementById('exam-status-bar').classList.add('hidden');
+      document.getElementById('progress-track').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      // Preencher banner de resultado
+      const pill = document.getElementById('result-status-pill');
+      const headline = document.getElementById('result-headline');
+      const subtext = document.getElementById('result-subtext');
+
+      if (approved) {
+        pill.className = 'inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3 bg-emerald-500 text-white';
+        pill.textContent = 'Aprovado • Média DSA Atingida (≥ 7,0)';
+        headline.textContent = 'Parabéns, futuro Líder!';
+        subtext.textContent = 'Você atingiu a pontuação mínima exigida pela Divisão Sul-Americana.';
+      } else {
+        pill.className = 'inline-block px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider mb-3 bg-rose-500 text-white';
+        pill.textContent = 'Abaixo da Média DSA (< 7,0)';
+        headline.textContent = 'Continue estudando o Nisto Cremos!';
+        subtext.textContent = 'Revise abaixo as questões erradas e os textos bíblicos para alcançar a nota 7,0.';
+      }
+
+      document.getElementById('final-grade').textContent = grade.toFixed(1).replace('.', ',');
+      document.getElementById('stat-correct').textContent = `${correctCount} (${Math.round((correctCount / total) * 100)}%)`;
+      document.getElementById('stat-wrong').textContent = wrongCount;
+      document.getElementById('stat-blank').textContent = blankCount;
+
+      const timeRow = document.getElementById('stat-time-row');
+      if (timerEnabled) {
+        timeRow.classList.remove('hidden');
+        document.getElementById('stat-time').textContent = formatDuration(elapsedSeconds);
+      } else {
+        timeRow.classList.add('hidden');
+      }
+
+      // Renderizar desempenho por bloco
+      const breakdownGrid = document.getElementById('block-breakdown-grid');
+      breakdownGrid.innerHTML = '';
+      for (let b = 1; b <= 6; b++) {
+        const st = blockStats[b];
+        if (st.total === 0) continue;
+        const pct = Math.round((st.correct / st.total) * 100);
+        const barColor = pct >= 70 ? 'bg-emerald-500' : (pct >= 50 ? 'bg-amber-500' : 'bg-rose-500');
+        const textColor = pct >= 70 ? 'text-emerald-700' : (pct >= 50 ? 'text-amber-700' : 'text-rose-700');
+
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl border border-slate-200 bg-slate-50/70';
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <span class="text-xs font-bold text-slate-800 leading-snug">${BLOCK_NAMES[b]}</span>
+            <span class="text-xs font-extrabold ${textColor} shrink-0">${st.correct}/${st.total} (${pct}%)</span>
+          </div>
+          <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+            <div class="${barColor} h-full rounded-full" style="width: ${pct}%"></div>
+          </div>
+        `;
+        breakdownGrid.appendChild(card);
+      }
+
+      renderReviewList('all');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterReview(filterType) {
+      document.querySelectorAll('.rev-filter-btn').forEach(btn => {
+        btn.className = 'rev-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+      const activeBtn = document.getElementById(`rev-filter-${filterType}`);
+      activeBtn.className = 'rev-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-dbv-navy text-white';
+
+      renderReviewList(filterType);
+    }
+
+    function renderReviewList(filterType) {
+      const list = document.getElementById('review-list');
+      list.innerHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      examQuestions.forEach((q, idx) => {
+        const userAns = userAnswers[idx];
+        const isCorrect = userAns === q.answer;
+        const isBlank = userAns === undefined;
+
+        if (filterType === 'correct' && !isCorrect) return;
+        if (filterType === 'wrong' && isCorrect) return;
+
+        const borderClass = isCorrect
+          ? 'border-emerald-200 bg-emerald-50/20'
+          : 'border-rose-200 bg-rose-50/20';
+
+        const statusBadge = isCorrect
+          ? `<span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-extrabold text-xs">✓ Correta</span>`
+          : isBlank
+            ? `<span class="px-2.5 py-0.5 rounded-md bg-slate-200 text-slate-700 font-extrabold text-xs">• Em branco</span>`
+            : `<span class="px-2.5 py-0.5 rounded-md bg-rose-100 text-rose-800 font-extrabold text-xs">✕ Incorreta</span>`;
+
+        let optionsHtml = '';
+        q.options.forEach((opt, optIdx) => {
+          const isThisCorrect = optIdx === q.answer;
+          const isThisUser = optIdx === userAns;
+
+          let rowStyle = 'p-3 rounded-xl border text-xs sm:text-sm flex items-start gap-2.5 ';
+          let badgeStyle = 'w-6 h-6 rounded-md font-bold text-xs flex items-center justify-center shrink-0 ';
+          let tag = '';
+
+          if (isThisCorrect) {
+            rowStyle += 'border-emerald-400 bg-emerald-50 text-emerald-950 font-semibold';
+            badgeStyle += 'bg-emerald-600 text-white';
+            tag = `<span class="ml-auto text-[11px] font-extrabold text-emerald-700 shrink-0">Gabarito</span>`;
+          } else if (isThisUser && !isThisCorrect) {
+            rowStyle += 'border-rose-400 bg-rose-50 text-rose-950';
+            badgeStyle += 'bg-rose-600 text-white';
+            tag = `<span class="ml-auto text-[11px] font-extrabold text-rose-700 shrink-0">Sua resposta</span>`;
+          } else {
+            rowStyle += 'border-slate-200 bg-white text-slate-600';
+            badgeStyle += 'bg-slate-100 text-slate-600';
+          }
+
+          optionsHtml += `
+            <div class="${rowStyle}">
+              <span class="${badgeStyle}">${letters[optIdx]}</span>
+              <span class="leading-snug">${opt}</span>
+              ${tag}
+            </div>
+          `;
+        });
+
+        const item = document.createElement('div');
+        item.className = `p-5 sm:p-6 rounded-2xl border ${borderClass}`;
+        item.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-sm text-dbv-navy">Questão ${idx + 1}</span>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700">${q.beliefName}</span>
+            </div>
+            ${statusBadge}
+          </div>
+          <p class="font-bold text-slate-900 text-sm sm:text-base mb-4 leading-relaxed">${q.question}</p>
+          <div class="space-y-2 mb-4">
+            ${optionsHtml}
+          </div>
+          <div class="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <strong class="text-dbv-navy">Fundamentação (Nisto Cremos):</strong> ${q.explanation}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      if (list.innerHTML === '') {
+        list.innerHTML = `<p class="text-center text-sm text-slate-500 py-8">Nenhuma questão encontrada neste filtro.</p>`;
+      }
+    }
+
+    function resetToSetup() {
+      clearInterval(timerInterval);
+      document.getElementById('result-screen').classList.add('hidden');
+      document.getElementById('exam-screen').classList.add('hidden');
+      document.getElementById('exam-status-bar').classList.add('hidden');
+      document.getElementById('progress-track').classList.add('hidden');
+      document.getElementById('setup-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
